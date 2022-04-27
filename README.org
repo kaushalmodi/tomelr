@@ -1,0 +1,743 @@
+#+title: Emacs-Lisp Library for converting S-expressions to TOML
+#+author: Kaushal Modi
+
+#+property: header-args :eval never-export
+
+* Specification and Conversion Examples
+Below examples are shown on how S-expressions get translated to
+various TOML object types.
+** Scalars
+*** String
+https://toml.io/en/v1.0.0#string
+**** S-expression
+#+begin_src emacs-lisp :eval no :noweb-ref scalar-string
+'((str . "Roses are red\nViolets are blue"))
+#+end_src
+**** TOML
+#+begin_src toml
+str = """
+Roses are red
+Violets are blue"""
+#+end_src
+**** JSON Reference
+#+begin_src emacs-lisp :noweb yes :exports results
+(json-encode-pretty
+  <<scalar-string>>)
+#+end_src
+
+#+RESULTS:
+: {
+:   "str": "Roses are red\nViolets are blue"
+: }
+*** Integer
+https://toml.io/en/v1.0.0#integer
+**** S-expression
+#+begin_src emacs-lisp :eval no :noweb-ref scalar-integer
+'((int1 . +99)
+  (int2 . 42)
+  (int3 . 0)
+  (int4 . -17))
+#+end_src
+**** TOML
+#+begin_src toml
+int1 = +99
+int2 = 42
+int3 = 0
+int4 = -17
+#+end_src
+**** JSON Reference
+#+begin_src emacs-lisp :noweb yes :exports results
+(json-encode-pretty
+  <<scalar-integer>>)
+#+end_src
+
+#+RESULTS:
+: {
+:   "int1": 99,
+:   "int2": 42,
+:   "int3": 0,
+:   "int4": -17
+: }
+*** Float
+https://toml.io/en/v1.0.0#float
+**** S-expression
+#+begin_src emacs-lisp :eval no :noweb-ref scalar-float
+'((flt1 . +1.0)
+  (flt2 . 3.1415)
+  (flt3 . -0.01)
+  (flt4 . 5e+22)
+  (flt5 . 1e06)
+  (flt6 . -2E-2)
+  (flt7 . 6.626e-34))
+#+end_src
+**** TOML
+#+begin_src toml
+# fractional
+flt1 = +1.0
+flt2 = 3.1415
+flt3 = -0.01
+
+# exponent
+flt4 = 5e+22
+flt5 = 1e06
+flt6 = -2E-2
+
+# both
+flt7 = 6.626e-34
+#+end_src
+**** JSON Reference
+#+begin_src emacs-lisp :noweb yes :exports results
+(json-encode-pretty
+  <<scalar-float>>)
+#+end_src
+
+#+RESULTS:
+: {
+:   "flt1": 1.0,
+:   "flt2": 3.1415,
+:   "flt3": -0.01,
+:   "flt4": 5e+22,
+:   "flt5": 1000000.0,
+:   "flt6": -0.02,
+:   "flt7": 6.626e-34
+: }
+*** Boolean
+https://toml.io/en/v1.0.0#boolean
+**** S-expression
+#+begin_src emacs-lisp :eval no :noweb-ref scalar-boolean
+'((bool1 . t)
+  (bool2 . nil))
+#+end_src
+**** TOML
+#+begin_src toml
+bool1 = true
+bool2 = false
+#+end_src
+**** JSON Reference
+#+begin_src emacs-lisp :noweb yes :exports results
+(json-encode-pretty
+  <<scalar-boolean>>)
+#+end_src
+
+#+RESULTS:
+: {
+:   "bool1": true,
+:   "bool2": null
+: }
+*** Date + Time with Offset
+https://toml.io/en/v1.0.0#offset-date-time
+**** S-expression
+#+begin_src emacs-lisp :eval no :noweb-ref scalar-odt
+'((odt1 . 1979-05-27T07:32:00Z)
+  (odt2 . 1979-05-27T00:32:00-07:00)
+  (odt3 . 1979-05-27T00:32:00.999999-07:00))
+#+end_src
+**** TOML
+#+begin_src toml
+odt1 = 1979-05-27T07:32:00Z
+odt2 = 1979-05-27T00:32:00-07:00
+odt3 = 1979-05-27T00:32:00.999999-07:00
+#+end_src
+**** JSON Reference
+#+begin_src emacs-lisp :noweb yes :exports results
+(json-encode-pretty
+  <<scalar-odt>>)
+#+end_src
+
+#+RESULTS:
+: {
+:   "odt1": "1979-05-27T07:32:00Z",
+:   "odt2": "1979-05-27T00:32:00-07:00",
+:   "odt3": "1979-05-27T00:32:00.999999-07:00"
+: }
+*** Date
+https://toml.io/en/v1.0.0#local-date
+**** S-expression
+#+begin_src emacs-lisp :eval no :noweb-ref scalar-date
+'((ld1 . 1979-05-27))
+#+end_src
+**** TOML
+#+begin_src toml
+ld1 = 1979-05-27
+#+end_src
+**** JSON Reference
+#+begin_src emacs-lisp :noweb yes :exports results
+(json-encode-pretty
+  <<scalar-date>>)
+#+end_src
+
+#+RESULTS:
+: {
+:   "ld1": "1979-05-27"
+: }
+** TOML Arrays: Lists
+https://toml.io/en/v1.0.0#array
+*** S-expression
+#+begin_src emacs-lisp :eval no :noweb-ref lists
+'((integers . (1 2 3))
+  (integers2 . [1 2 3])                 ;Same as above
+  (colors . ("red" "yellow" "green"))
+  (nested_arrays_of_ints . [(1 2) (3 4 5)])
+  (nested_mixed_array . [(1 2) ("a" "b" "c")])
+  (string_array . ("all" "strings" "are the same" "type"))
+  (numbers . (0.1 0.2 0.5 1 2 5))
+  (contributors . ("Foo Bar <foo@example.com>"
+                   ((name . "Baz Qux")
+                    (email . "bazqux@example.com")
+                    (url . "https://example.com/bazqux")))))
+#+end_src
+*** TOML
+#+begin_src toml
+integers = [ 1, 2, 3 ]
+colors = [ "red", "yellow", "green" ]
+nested_arrays_of_ints = [ [ 1, 2 ], [3, 4, 5] ]
+nested_mixed_array = [ [ 1, 2 ], ["a", "b", "c"] ]
+string_array = [ "all", 'strings', """are the same""", '''type''' ]
+
+# Mixed-type arrays are allowed
+numbers = [ 0.1, 0.2, 0.5, 1, 2, 5 ]
+contributors = [
+  "Foo Bar <foo@example.com>",
+  { name = "Baz Qux", email = "bazqux@example.com", url = "https://example.com/bazqux" }
+]
+#+end_src
+*** JSON Reference
+#+begin_src emacs-lisp :noweb yes :exports results
+(json-encode-pretty
+  <<lists>>)
+#+end_src
+
+#+RESULTS:
+#+begin_example
+{
+  "integers": [
+    1,
+    2,
+    3
+  ],
+  "integers2": [
+    1,
+    2,
+    3
+  ],
+  "colors": [
+    "red",
+    "yellow",
+    "green"
+  ],
+  "nested_arrays_of_ints": [
+    [
+      1,
+      2
+    ],
+    [
+      3,
+      4,
+      5
+    ]
+  ],
+  "nested_mixed_array": [
+    [
+      1,
+      2
+    ],
+    [
+      "a",
+      "b",
+      "c"
+    ]
+  ],
+  "string_array": [
+    "all",
+    "strings",
+    "are the same",
+    "type"
+  ],
+  "numbers": [
+    0.1,
+    0.2,
+    0.5,
+    1,
+    2,
+    5
+  ],
+  "contributors": [
+    "Foo Bar <foo@example.com>",
+    {
+      "name": "Baz Qux",
+      "email": "bazqux@example.com",
+      "url": "https://example.com/bazqux"
+    }
+  ]
+}
+#+end_example
+** TOML Tables: Maps or Dictionaries or Hash Tables
+*** S-expression
+#+begin_src emacs-lisp :eval no :noweb-ref tables
+'((table-1 . ((key1 . "some string")
+              (key2 . 123)))
+  (table-2 . ((key1 . "another string")
+              (key2 . 456))))
+#+end_src
+*** TOML
+#+begin_src toml
+[table-1]
+  key1 = "some string"
+  key2 = 123
+
+[table-2]
+  key1 = "another string"
+  key2 = 456
+#+end_src
+*** JSON Reference
+#+begin_src emacs-lisp :noweb yes :exports results
+(json-encode-pretty
+  <<tables>>)
+#+end_src
+
+#+RESULTS:
+#+begin_example
+{
+  "table-1": {
+    "key1": "some string",
+    "key2": 123
+  },
+  "table-2": {
+    "key1": "another string",
+    "key2": 456
+  }
+}
+#+end_example
+** TOML Array of Tables: Lists of Maps
+*** S-expression
+#+begin_src emacs-lisp :eval no :noweb-ref table-arrays
+'((products . (((name . "Hammer")
+                (sku . 738594937))
+               ()
+               ((name . "Nail")
+                (sku . 284758393)
+                (color . "gray"))))
+
+  (fruits . (((name . "apple")
+              (physical . ((color . "red")
+                           (shape . "round")))
+              (varieties . ((((name . "red delicious"))
+                             ((name . "granny smith"))))))
+             ((name . "banana")
+              (varieties . (((name . "plantain"))))))))
+#+end_src
+*** TOML
+#+begin_src toml
+[[products]]
+  name = "Hammer"
+  sku = 738594937
+
+[[products]]  # empty table within the array
+
+[[products]]
+  name = "Nail"
+  sku = 284758393
+
+  color = "gray"
+
+[[fruits]]
+  name = "apple"
+
+  [fruits.physical]  # subtable
+    color = "red"
+    shape = "round"
+
+  [[fruits.varieties]]  # nested array of tables
+    name = "red delicious"
+
+  [[fruits.varieties]]
+    name = "granny smith"
+
+[[fruits]]
+  name = "banana"
+
+  [[fruits.varieties]]
+    name = "plantain"
+#+end_src
+*** JSON Reference
+#+begin_src emacs-lisp :noweb yes :exports results
+(json-encode-pretty
+  <<table-arrays>>)
+#+end_src
+
+#+RESULTS:
+#+begin_example
+{
+  "products": [
+    {
+      "name": "Hammer",
+      "sku": 738594937
+    },
+    null,
+    {
+      "name": "Nail",
+      "sku": 284758393,
+      "color": "gray"
+    }
+  ],
+  "fruits": [
+    {
+      "name": "apple",
+      "physical": {
+        "color": "red",
+        "shape": "round"
+      },
+      "varieties": [
+        [
+          {
+            "name": "red delicious"
+          },
+          {
+            "name": "granny smith"
+          }
+        ]
+      ]
+    },
+    {
+      "name": "banana",
+      "varieties": [
+        {
+          "name": "plantain"
+        }
+      ]
+    }
+  ]
+}
+#+end_example
+** Combinations of all of the above
+*** S-expression
+#+begin_src emacs-lisp :eval no :noweb-ref medley
+'((title . "Keyword Collection")
+  (author . ("firstname1 lastname1" "firstname2 lastname2" "firstname3 lastname3"))
+  (aliases . ("/posts/keyword-concatenation" "/posts/keyword-merging"))
+  (images . ("image 1" "image 2"))
+  (keywords . ("keyword1" "keyword2" "three word keywords3"))
+  (outputs . ("html" "json"))
+  (series . ("series 1" "series 2"))
+  (tags . ("mega front-matter" "keys" "collection" "concatenation" "merging"))
+  (categories . ("cat1" "cat2"))
+  (videos . ("video 1" "video 2"))
+  (draft . nil)
+  (categories_weight . 999)
+  (tags_weight . 88)
+  (weight . 7)
+  (myfoo . "bar")
+  (mybaz . "zoo")
+  (alpha . 1)
+  (beta . "two words")
+  (gamma . 10)
+  (animals . ("dog" "cat" "penguin" "mountain gorilla"))
+  (strings-symbols . ("abc" "def" "two words"))
+  (integers . (123 -5 17 1234))
+  (floats . (12.3 -5.0 -1.7e-05))
+  (booleans . (t nil))
+  (dog . ((legs . 4)
+          (eyes . 2)
+          (friends . ("poo" "boo"))))
+  (header . ((image . "projects/Readingabook.jpg")
+             (caption . "stay hungry stay foolish")))
+  (collection . ((nothing . nil)
+                 (nonnil . t)
+                 (animals . ("dog" "cat" "penguin" "mountain gorilla"))
+                 (strings-symbols . ("abc" "def" "two words"))
+                 (integers . (123 -5 17 1234))
+                 (floats . (12.3 -5.0 -1.7e-05))
+                 (booleans . (t nil))))
+  (menu . ((foo . ((identifier . "keyword-collection")
+                   (weight . 10)))))
+  (resources . (((src . "*.png")
+                 (name . "my-cool-image-:counter")
+                 (title . "The Image #:counter")
+                 (params . ((foo . "bar")
+                            (floats . (12.3 -5.0 -1.7e-05))
+                            (strings-symbols . ("abc" "def" "two words"))
+                            (animals . ("dog" "cat" "penguin" "mountain gorilla"))
+                            (integers . (123 -5 17 1234))
+                            (booleans . (t nil))
+                            (byline . "bep"))))
+                ((src . "image-4.png")
+                 (title . "The Fourth Image"))
+                ((src . "*.jpg")
+                 (title . "JPEG Image #:counter")))))
+#+end_src
+*** TOML
+#+begin_src toml
+title = "Keyword Collection"
+author = ["firstname1 lastname1", "firstname2 lastname2", "firstname3 lastname3"]
+aliases = ["/posts/keyword-concatenation", "/posts/keyword-merging"]
+images = ["image 1", "image 2"]
+keywords = ["keyword1", "keyword2", "three word keywords3"]
+outputs = ["html", "json"]
+series = ["series 1", "series 2"]
+tags = ["mega front-matter", "keys", "collection", "concatenation", "merging"]
+categories = ["cat1", "cat2"]
+videos = ["video 1", "video 2"]
+draft = false
+categories_weight = 999
+tags_weight = 88
+weight = 7
+myfoo = "bar"
+mybaz = "zoo"
+alpha = 1
+beta = "two words"
+gamma = 10
+animals = ["dog", "cat", "penguin", "mountain gorilla"]
+strings-symbols = ["abc", "def", "two words"]
+integers = [123, -5, 17, 1_234]
+floats = [12.3, -5.0, -1.7e-05]
+booleans = [true, false]
+[dog]
+  legs = 4
+  eyes = 2
+  friends = ["poo", "boo"]
+[header]
+  image = "projects/Readingabook.jpg"
+  caption = "stay hungry, stay foolish"
+[collection]
+  nothing = false
+  nonnil = true
+  animals = ["dog", "cat", "penguin", "mountain gorilla"]
+  strings-symbols = ["abc", "def", "two words"]
+  integers = [123, -5, 17, 1_234]
+  floats = [12.3, -5.0, -1.7e-05]
+  booleans = [true, false]
+[menu.foo]
+  identifier = "keyword-collection"
+  weight = 10
+[[resources]]
+  src = "*.png"
+  name = "my-cool-image-:counter"
+  title = "The Image #:counter"
+  [resources.params]
+    foo = "bar"
+    floats = [12.3, -5.0, -1.7e-05]
+    strings-symbols = ["abc", "def", "two words"]
+    animals = ["dog", "cat", "penguin", "mountain gorilla"]
+    integers = [123, -5, 17, 1_234]
+    booleans = [true, false]
+    byline = "bep"
+[[resources]]
+  src = "image-4.png"
+  title = "The Fourth Image"
+[[resources]]
+  src = "*.jpg"
+  title = "JPEG Image #:counter"
+#+end_src
+*** JSON Reference
+#+begin_src emacs-lisp :noweb yes :exports results
+(json-encode-pretty
+  <<medley>>)
+#+end_src
+
+#+RESULTS:
+#+begin_example
+{
+  "title": "Keyword Collection",
+  "author": [
+    "firstname1 lastname1",
+    "firstname2 lastname2",
+    "firstname3 lastname3"
+  ],
+  "aliases": [
+    "/posts/keyword-concatenation",
+    "/posts/keyword-merging"
+  ],
+  "images": [
+    "image 1",
+    "image 2"
+  ],
+  "keywords": [
+    "keyword1",
+    "keyword2",
+    "three word keywords3"
+  ],
+  "outputs": [
+    "html",
+    "json"
+  ],
+  "series": [
+    "series 1",
+    "series 2"
+  ],
+  "tags": [
+    "mega front-matter",
+    "keys",
+    "collection",
+    "concatenation",
+    "merging"
+  ],
+  "categories": [
+    "cat1",
+    "cat2"
+  ],
+  "videos": [
+    "video 1",
+    "video 2"
+  ],
+  "draft": null,
+  "categories_weight": 999,
+  "tags_weight": 88,
+  "weight": 7,
+  "myfoo": "bar",
+  "mybaz": "zoo",
+  "alpha": 1,
+  "beta": "two words",
+  "gamma": 10,
+  "animals": [
+    "dog",
+    "cat",
+    "penguin",
+    "mountain gorilla"
+  ],
+  "strings-symbols": [
+    "abc",
+    "def",
+    "two words"
+  ],
+  "integers": [
+    123,
+    -5,
+    17,
+    1234
+  ],
+  "floats": [
+    12.3,
+    -5.0,
+    -1.7e-05
+  ],
+  "booleans": [
+    true,
+    null
+  ],
+  "dog": {
+    "legs": 4,
+    "eyes": 2,
+    "friends": [
+      "poo",
+      "boo"
+    ]
+  },
+  "header": {
+    "image": "projects/Readingabook.jpg",
+    "caption": "stay hungry stay foolish"
+  },
+  "collection": {
+    "nothing": null,
+    "nonnil": true,
+    "animals": [
+      "dog",
+      "cat",
+      "penguin",
+      "mountain gorilla"
+    ],
+    "strings-symbols": [
+      "abc",
+      "def",
+      "two words"
+    ],
+    "integers": [
+      123,
+      -5,
+      17,
+      1234
+    ],
+    "floats": [
+      12.3,
+      -5.0,
+      -1.7e-05
+    ],
+    "booleans": [
+      true,
+      null
+    ]
+  },
+  "menu": {
+    "foo": {
+      "identifier": "keyword-collection",
+      "weight": 10
+    }
+  },
+  "resources": [
+    {
+      "src": "*.png",
+      "name": "my-cool-image-:counter",
+      "title": "The Image #:counter",
+      "params": {
+        "foo": "bar",
+        "floats": [
+          12.3,
+          -5.0,
+          -1.7e-05
+        ],
+        "strings-symbols": [
+          "abc",
+          "def",
+          "two words"
+        ],
+        "animals": [
+          "dog",
+          "cat",
+          "penguin",
+          "mountain gorilla"
+        ],
+        "integers": [
+          123,
+          -5,
+          17,
+          1234
+        ],
+        "booleans": [
+          true,
+          null
+        ],
+        "byline": "bep"
+      }
+    },
+    {
+      "src": "image-4.png",
+      "title": "The Fourth Image"
+    },
+    {
+      "src": "*.jpg",
+      "title": "JPEG Image #:counter"
+    }
+  ]
+}
+#+end_example
+* COMMENT Development
+** Running Tests
+*** Run all tests
+#+begin_src shell
+make test
+#+end_src
+*** Run tests matching a specific string
+Run ~make test MATCH=<string>~. For example, to run all tests where
+the name matches "scalar" completely or partially, run:
+
+#+begin_src shell
+make test MATCH=scalar
+#+end_src
+* Helper function
+** JSON Reference pretty print string
+The ~json-encode-pretty~ function defined here is used to pretty-print
+the above JSON examples.
+
+#+begin_src emacs-lisp :results none
+(defun json-encode-pretty (object)
+  "Return prettified JSONified version of OBJECT."
+  (with-temp-buffer
+    (insert (json-encode object))
+    (json-pretty-print-buffer)
+    (buffer-substring-no-properties (point-min) (point-max))))
+#+end_src
+* Reference
+[[https://toml.io/en/v1.0.0/][TOML v1.0.0 Spec]]
+* COMMENT Local Variables                                                   :ARCHIVE:
+# Local Variables:
+# eval: (setq-local org-fold-core-style 'overlays)
+# End:
