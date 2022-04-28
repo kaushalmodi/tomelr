@@ -53,5 +53,26 @@
       (push (tomelr-encode el) out))
     (should (equal ref (nreverse out)))))
 
+;;;; Scalar - Float
+(ert-deftest test-scalar-float ()
+  (let ((inp '(((float1 . +1.0))
+               ((float2 . 3.1415))
+               ((float3 . -0.01))
+               ((float4 . 5e+22))
+               ((float5 . 1e06))
+               ((float6 . -2E-2))
+               ((float7 . 6.626e-34))))
+        (ref '("float1 = 1.0"
+               "float2 = 3.1415"
+               "float3 = -0.01"
+               "float4 = 5e+22"
+               "float5 = 1000000.0"
+               "float6 = -0.02"
+               "float7 = 6.626e-34"))
+        out)
+    (dolist (el inp)
+      (push (tomelr-encode el) out))
+    (should (equal ref (nreverse out)))))
+
 
 (provide 'tscalar)

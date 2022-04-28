@@ -22,8 +22,8 @@ specification defined below.
 - [-] Scalar
   - [X] Boolean
   - [X] Integer
+  - [X] Float
   - [ ] String
-  - [ ] Float
   - [ ] Date + Time with Offset
   - [ ] Date
   - [ ] Nil
@@ -104,6 +104,51 @@ int4 = -17
 :   "int3": 0,
 :   "int4": -17
 : }
+*** DONE Float
+CLOSED: [2022-04-28 Thu 17:29]
+https://toml.io/en/v1.0.0#float
+**** S-expression
+#+begin_src emacs-lisp :eval no :noweb-ref scalar-float
+'((flt1 . +1.0)
+  (flt2 . 3.1415)
+  (flt3 . -0.01)
+  (flt4 . 5e+22)
+  (flt5 . 1e06)
+  (flt6 . -2E-2)
+  (flt7 . 6.626e-34))
+#+end_src
+**** TOML
+#+begin_src emacs-lisp :noweb yes :exports results :wrap src toml
+(tomelr-encode
+  <<scalar-float>>)
+#+end_src
+
+#+RESULTS:
+#+begin_src toml
+flt1 = 1.0
+flt2 = 3.1415
+flt3 = -0.01
+flt4 = 5e+22
+flt5 = 1000000.0
+flt6 = -0.02
+flt7 = 6.626e-34
+#+end_src
+**** JSON Reference
+#+begin_src emacs-lisp :noweb yes :exports results
+(json-encode-pretty
+  <<scalar-float>>)
+#+end_src
+
+#+RESULTS:
+: {
+:   "flt1": 1.0,
+:   "flt2": 3.1415,
+:   "flt3": -0.01,
+:   "flt4": 5e+22,
+:   "flt5": 1000000.0,
+:   "flt6": -0.02,
+:   "flt7": 6.626e-34
+: }
 *** String
 https://toml.io/en/v1.0.0#string
 **** S-expression
@@ -125,49 +170,6 @@ Violets are blue"""
 #+RESULTS:
 : {
 :   "str": "Roses are red\nViolets are blue"
-: }
-*** Float
-https://toml.io/en/v1.0.0#float
-**** S-expression
-#+begin_src emacs-lisp :eval no :noweb-ref scalar-float
-'((flt1 . +1.0)
-  (flt2 . 3.1415)
-  (flt3 . -0.01)
-  (flt4 . 5e+22)
-  (flt5 . 1e06)
-  (flt6 . -2E-2)
-  (flt7 . 6.626e-34))
-#+end_src
-**** TOML
-#+begin_src toml
-# fractional
-flt1 = 1.0
-flt2 = 3.1415
-flt3 = -0.01
-
-# exponent
-flt4 = 5e+22
-flt5 = 1e06
-flt6 = -2E-2
-
-# both
-flt7 = 6.626e-34
-#+end_src
-**** JSON Reference
-#+begin_src emacs-lisp :noweb yes :exports results
-(json-encode-pretty
-  <<scalar-float>>)
-#+end_src
-
-#+RESULTS:
-: {
-:   "flt1": 1.0,
-:   "flt2": 3.1415,
-:   "flt3": -0.01,
-:   "flt4": 5e+22,
-:   "flt5": 1000000.0,
-:   "flt6": -0.02,
-:   "flt7": 6.626e-34
 : }
 *** Date + Time with Offset
 https://toml.io/en/v1.0.0#offset-date-time
