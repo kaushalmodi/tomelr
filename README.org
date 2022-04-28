@@ -899,7 +899,7 @@ the name matches "scalar" completely or partially, run:
 #+begin_src shell
 make test MATCH=scalar
 #+end_src
-* Helper function
+* COMMENT Helper function
 ** JSON Reference pretty print string
 The ~json-encode-pretty~ function defined here is used to pretty-print
 the above JSON examples.
@@ -908,10 +908,9 @@ the above JSON examples.
 (defun json-encode-pretty (object)
   "Return prettified JSONified version of OBJECT."
   (with-temp-buffer
-    (let ((json-false :false))
-      (insert (json-encode object))
-      (json-pretty-print-buffer)
-      (buffer-substring-no-properties (point-min) (point-max)))))
+    (let ((json-false :false)
+          (json-encoding-pretty-print t))
+      (json-encode object))))
 #+end_src
 * Reference
 [[https://toml.io/en/v1.0.0/][TOML v1.0.0 Spec]]
