@@ -106,7 +106,7 @@ https://toml.io/en/v1.0.0#boolean
 **** S-expression
 #+begin_src emacs-lisp :eval no :noweb-ref scalar-boolean
 '((bool1 . t)
-  (bool2 . nil))
+  (bool2 . :false))
 #+end_src
 **** TOML
 #+begin_src toml
@@ -122,7 +122,7 @@ bool2 = false
 #+RESULTS:
 : {
 :   "bool1": true,
-:   "bool2": null
+:   "bool2": false
 : }
 *** Date + Time with Offset
 https://toml.io/en/v1.0.0#offset-date-time
@@ -422,7 +422,7 @@ contributors = [
   (tags . ("mega front-matter" "keys" "collection" "concatenation" "merging"))
   (categories . ("cat1" "cat2"))
   (videos . ("video 1" "video 2"))
-  (draft . nil)
+  (draft . :false)
   (categories_weight . 999)
   (tags_weight . 88)
   (weight . 7)
@@ -435,19 +435,19 @@ contributors = [
   (strings-symbols . ("abc" "def" "two words"))
   (integers . (123 -5 17 1234))
   (floats . (12.3 -5.0 -1.7e-05))
-  (booleans . (t nil))
+  (booleans . (t :false))
   (dog . ((legs . 4)
           (eyes . 2)
           (friends . ("poo" "boo"))))
   (header . ((image . "projects/Readingabook.jpg")
              (caption . "stay hungry stay foolish")))
-  (collection . ((nothing . nil)
+  (collection . ((nothing . :false)
                  (nonnil . t)
                  (animals . ("dog" "cat" "penguin" "mountain gorilla"))
                  (strings-symbols . ("abc" "def" "two words"))
                  (integers . (123 -5 17 1234))
                  (floats . (12.3 -5.0 -1.7e-05))
-                 (booleans . (t nil))))
+                 (booleans . (t :false))))
   (menu . ((foo . ((identifier . "keyword-collection")
                    (weight . 10)))))
   (resources . (((src . "*.png")
@@ -458,7 +458,7 @@ contributors = [
                             (strings-symbols . ("abc" "def" "two words"))
                             (animals . ("dog" "cat" "penguin" "mountain gorilla"))
                             (integers . (123 -5 17 1234))
-                            (booleans . (t nil))
+                            (booleans . (t :false))
                             (byline . "bep"))))
                 ((src . "image-4.png")
                  (title . "The Fourth Image"))
@@ -579,7 +579,7 @@ booleans = [true, false]
     "video 1",
     "video 2"
   ],
-  "draft": null,
+  "draft": false,
   "categories_weight": 999,
   "tags_weight": 88,
   "weight": 7,
@@ -612,7 +612,7 @@ booleans = [true, false]
   ],
   "booleans": [
     true,
-    null
+    false
   ],
   "dog": {
     "legs": 4,
@@ -627,7 +627,7 @@ booleans = [true, false]
     "caption": "stay hungry stay foolish"
   },
   "collection": {
-    "nothing": null,
+    "nothing": false,
     "nonnil": true,
     "animals": [
       "dog",
@@ -653,7 +653,7 @@ booleans = [true, false]
     ],
     "booleans": [
       true,
-      null
+      false
     ]
   },
   "menu": {
@@ -693,7 +693,7 @@ booleans = [true, false]
         ],
         "booleans": [
           true,
-          null
+          false
         ],
         "byline": "bep"
       }
@@ -709,6 +709,36 @@ booleans = [true, false]
   ]
 }
 #+end_example
+** Nil
+**** S-expression
+#+begin_src emacs-lisp :eval no :noweb-ref nil-value
+'((key1 . 123)
+  (key2 . nil)
+  (key3 . "abc")
+  (key4 . :false)
+  (key5 . t))
+#+end_src
+**** TOML
+#+begin_src toml
+key1 = 123
+key3 = "abc"
+key4 = false
+key5 = true
+#+end_src
+**** JSON Reference
+#+begin_src emacs-lisp :noweb yes :exports results
+(json-encode-pretty
+  <<nil-value>>)
+#+end_src
+
+#+RESULTS:
+: {
+:   "key1": 123,
+:   "key2": null,
+:   "key3": "abc",
+:   "key4": false,
+:   "key5": true
+: }
 * COMMENT Development
 ** Running Tests
 *** Run all tests
@@ -731,9 +761,10 @@ the above JSON examples.
 (defun json-encode-pretty (object)
   "Return prettified JSONified version of OBJECT."
   (with-temp-buffer
-    (insert (json-encode object))
-    (json-pretty-print-buffer)
-    (buffer-substring-no-properties (point-min) (point-max))))
+    (let ((json-false :false))
+      (insert (json-encode object))
+      (json-pretty-print-buffer)
+      (buffer-substring-no-properties (point-min) (point-max)))))
 #+end_src
 * Reference
 [[https://toml.io/en/v1.0.0/][TOML v1.0.0 Spec]]
