@@ -786,6 +786,106 @@ key5 = true
 :   "key4": false,
 :   "key5": true
 : }
+** P-lists
+**** S-expression
+#+begin_src emacs-lisp :eval no :noweb-ref p-list
+'(:int 123
+  :remove_this_key  nil
+  :str "abc"
+  :bool_false :false
+  :bool_true t
+  :int_list (1 2 3)
+  :str_list ("a" "b" "c")
+  :bool_list (t :false t :false)
+  :list_of_lists [(1 2) (3 4 5)]
+  :map (:key1 123
+        :key2 "xyz")
+  :list_of_maps [(:key1 123
+                  :key2 "xyz")
+                 (:key1 567
+                  :key2 "klm")])
+#+end_src
+**** TOML
+#+begin_src toml
+int = 123.0
+str = "abc"
+bool_false = false
+bool_true = true
+int_list = [1.0, 2.0, 3.0]
+str_list = ["a", "b", "c"]
+bool_list = [true, false, true, false]
+list_of_lists = [ [1.0, 2.0],
+                  [3.0, 4.0, 5.0] ]
+
+[map]
+  key1 = 123.0
+  key2 = "xyz"
+
+[[list_of_maps]]
+  key1 = 123.0
+  key2 = "xyz"
+[[list_of_maps]]
+  key1 = 567.0
+  key2 = "klm"
+#+end_src
+**** JSON Reference
+#+begin_src emacs-lisp :noweb yes :exports results
+(json-encode-pretty
+  <<p-list>>)
+#+end_src
+
+#+RESULTS:
+#+begin_example
+{
+  "int": 123,
+  "remove_this_key": null,
+  "str": "abc",
+  "bool_false": false,
+  "bool_true": true,
+  "int_list": [
+    1,
+    2,
+    3
+  ],
+  "str_list": [
+    "a",
+    "b",
+    "c"
+  ],
+  "bool_list": [
+    true,
+    false,
+    true,
+    false
+  ],
+  "list_of_lists": [
+    [
+      1,
+      2
+    ],
+    [
+      3,
+      4,
+      5
+    ]
+  ],
+  "map": {
+    "key1": 123,
+    "key2": "xyz"
+  },
+  "list_of_maps": [
+    {
+      "key1": 123,
+      "key2": "xyz"
+    },
+    {
+      "key1": 567,
+      "key2": "klm"
+    }
+  ]
+}
+#+end_example
+
 * COMMENT Development
 ** Running Tests
 *** Run all tests
