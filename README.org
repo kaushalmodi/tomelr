@@ -10,10 +10,46 @@
 * Installation
 Clone this repo, have ~tomelr.el~ in the ~load-path~ and ~(require
 'tomelr)~.
+* Credit
+This library started off by extracting the JSON Encoding pieces from
+the Emacs core library [[https://git.savannah.gnu.org/cgit/emacs.git/tree/lisp/json.el][*json.el*]].
+
+It will then be gradually refactored so that it meets the
+specification defined below.
 * Specification and Conversion Examples
+[[https://scripter.co/defining-tomelr/][Companion blog post]]
+
 Below examples are shown on how S-expressions get translated to
 various TOML object types.
 ** Scalars
+*** DONE Boolean
+CLOSED: [2022-04-28 Thu 16:48]
+https://toml.io/en/v1.0.0#boolean
+**** S-expression
+#+begin_src emacs-lisp :eval no :noweb-ref scalar-boolean
+'((bool1 . t)
+  (bool2 . :false))
+#+end_src
+**** TOML
+#+begin_src emacs-lisp :noweb yes :exports results
+(tomelr-encode
+  <<scalar-boolean>>)
+#+end_src
+
+#+RESULTS:
+: bool1 = true
+: bool2 = false
+**** JSON Reference
+#+begin_src emacs-lisp :noweb yes :exports results
+(json-encode-pretty
+  <<scalar-boolean>>)
+#+end_src
+
+#+RESULTS:
+: {
+:   "bool1": true,
+:   "bool2": false
+: }
 *** String
 https://toml.io/en/v1.0.0#string
 **** S-expression
@@ -107,29 +143,6 @@ flt7 = 6.626e-34
 :   "flt5": 1000000.0,
 :   "flt6": -0.02,
 :   "flt7": 6.626e-34
-: }
-*** Boolean
-https://toml.io/en/v1.0.0#boolean
-**** S-expression
-#+begin_src emacs-lisp :eval no :noweb-ref scalar-boolean
-'((bool1 . t)
-  (bool2 . :false))
-#+end_src
-**** TOML
-#+begin_src toml
-bool1 = true
-bool2 = false
-#+end_src
-**** JSON Reference
-#+begin_src emacs-lisp :noweb yes :exports results
-(json-encode-pretty
-  <<scalar-boolean>>)
-#+end_src
-
-#+RESULTS:
-: {
-:   "bool1": true,
-:   "bool2": false
 : }
 *** Date + Time with Offset
 https://toml.io/en/v1.0.0#offset-date-time
