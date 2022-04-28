@@ -16,6 +16,20 @@ the Emacs core library [[https://git.savannah.gnu.org/cgit/emacs.git/tree/lisp/j
 
 It will then be gradually refactored so that it meets the
 specification defined below.
+* Library Completion Status [0/6]
+- [-] Scalar
+  - [X] Boolean
+  - [ ] String
+  - [ ] Integer
+  - [ ] Float
+  - [ ] Date + Time with Offset
+  - [ ] Date
+  - [ ] Nil
+- [ ] Arrays
+- [ ] Array of Arrays
+- [ ] Tables
+- [ ] Array of Tables
+- [ ] Property Lists
 * Specification and Conversion Examples
 [[https://scripter.co/defining-tomelr/][Companion blog post]]
 
@@ -906,7 +920,7 @@ list_of_lists = [ [1.0, 2.0],
 }
 #+end_example
 
-* COMMENT Development
+* Development
 ** Running Tests
 *** Run all tests
 #+begin_src shell
@@ -932,8 +946,9 @@ the above JSON examples.
           (json-encoding-pretty-print t))
       (json-encode object))))
 #+end_src
-* Reference
-[[https://toml.io/en/v1.0.0/][TOML v1.0.0 Spec]]
+* References
+- [[https://toml.io/en/v1.0.0/][TOML v1.0.0 Spec]]
+- [[https://toolkit.site/format.html][Online JSON/TOML/YAML converter]]
 * COMMENT Local Variables                                                   :ARCHIVE:
 # Local Variables:
 # eval: (setq-local org-fold-core-style 'overlays)
