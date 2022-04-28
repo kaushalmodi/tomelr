@@ -324,40 +324,51 @@ contributors = [
               (varieties . ((((name . "red delicious"))
                              ((name . "granny smith"))))))
              ((name . "banana")
-              (varieties . (((name . "plantain"))))))))
+              (varieties . (((name . "plantain")))))))
+
+
+  (org_logbook . (((timestamp . 2022-04-08T14:53:00-04:00)
+                   (note . "This note addition prompt shows up on typing the `C-c C-z` binding.\nSee [org#Drawers](https://www.gnu.org/software/emacs/manual/html_mono/org.html#Drawers)."))
+                  ((timestamp . 2018-09-06T11:45:00-04:00)
+                   (note . "Another note **bold** _italics_."))
+                  ((timestamp . 2018-09-06T11:37:00-04:00)
+                   (note . "A note `mono`.")))))
 #+end_src
 *** TOML
 #+begin_src toml
 [[products]]
   name = "Hammer"
   sku = 738594937
-
 [[products]]  # empty table within the array
-
 [[products]]
   name = "Nail"
   sku = 284758393
-
   color = "gray"
 
 [[fruits]]
   name = "apple"
-
   [fruits.physical]  # subtable
     color = "red"
     shape = "round"
-
   [[fruits.varieties]]  # nested array of tables
     name = "red delicious"
-
   [[fruits.varieties]]
     name = "granny smith"
-
 [[fruits]]
   name = "banana"
-
   [[fruits.varieties]]
     name = "plantain"
+
+[[org_logbook]]
+  timestamp = 2022-04-08T14:53:00-04:00
+  note = """This note addition prompt shows up on typing the `C-c C-z` binding.
+See [org#Drawers](https://www.gnu.org/software/emacs/manual/html_mono/org.html#Drawers)."""
+[[org_logbook]]
+  timestamp = 2018-09-06T11:45:00-04:00
+  note = """Another note **bold** _italics_."""
+[[org_logbook]]
+  timestamp = 2018-09-06T11:37:00-04:00
+  note = """A note `mono`."""
 #+end_src
 *** JSON Reference
 #+begin_src emacs-lisp :noweb yes :exports results
@@ -405,6 +416,20 @@ contributors = [
           "name": "plantain"
         }
       ]
+    }
+  ],
+  "org_logbook": [
+    {
+      "timestamp": "2022-04-08T14:53:00-04:00",
+      "note": "This note addition prompt shows up on typing the `C-c C-z` binding.\nSee [org#Drawers](https://www.gnu.org/software/emacs/manual/html_mono/org.html#Drawers)."
+    },
+    {
+      "timestamp": "2018-09-06T11:45:00-04:00",
+      "note": "Another note **bold** _italics_."
+    },
+    {
+      "timestamp": "2018-09-06T11:37:00-04:00",
+      "note": "A note `mono`."
     }
   ]
 }
