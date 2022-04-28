@@ -8,8 +8,8 @@
 [[https://github.com/kaushalmodi/tomelr/actions][https://github.com/kaushalmodi/tomelr/actions/workflows/test.yml/badge.svg]] [[https://www.gnu.org/licenses/gpl-3.0][https://img.shields.io/badge/License-GPL%20v3-blue.svg]]
 
 * Installation
-Clone this repo, have ~baser.el~ in the ~load-path~ and ~(require
-'baser)~.
+Clone this repo, have ~tomelr.el~ in the ~load-path~ and ~(require
+'tomelr)~.
 * Specification and Conversion Examples
 Below examples are shown on how S-expressions get translated to
 various TOML object types.
