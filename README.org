@@ -40,7 +40,7 @@ https://toml.io/en/v1.0.0#integer
 #+end_src
 **** TOML
 #+begin_src toml
-int1 = +99
+int1 = 99
 int2 = 42
 int3 = 0
 int4 = -17
@@ -73,7 +73,7 @@ https://toml.io/en/v1.0.0#float
 **** TOML
 #+begin_src toml
 # fractional
-flt1 = +1.0
+flt1 = 1.0
 flt2 = 3.1415
 flt3 = -0.01
 
@@ -128,9 +128,9 @@ bool2 = false
 https://toml.io/en/v1.0.0#offset-date-time
 **** S-expression
 #+begin_src emacs-lisp :eval no :noweb-ref scalar-odt
-'((odt1 . 1979-05-27T07:32:00Z)
-  (odt2 . 1979-05-27T00:32:00-07:00)
-  (odt3 . 1979-05-27T00:32:00.999999-07:00))
+'((odt1 . "1979-05-27T07:32:00Z")
+  (odt2 . "1979-05-27T00:32:00-07:00")
+  (odt3 . "1979-05-27T00:32:00.999999-07:00"))
 #+end_src
 **** TOML
 #+begin_src toml
@@ -154,7 +154,7 @@ odt3 = 1979-05-27T00:32:00.999999-07:00
 https://toml.io/en/v1.0.0#local-date
 **** S-expression
 #+begin_src emacs-lisp :eval no :noweb-ref scalar-date
-'((ld1 . 1979-05-27))
+'((ld1 . "1979-05-27"))
 #+end_src
 **** TOML
 #+begin_src toml
@@ -172,36 +172,26 @@ ld1 = 1979-05-27
 : }
 ** TOML Arrays: Lists
 https://toml.io/en/v1.0.0#array
-*** S-expression
+*** Lists
+**** S-expression
 #+begin_src emacs-lisp :eval no :noweb-ref lists
 '((integers . (1 2 3))
   (integers2 . [1 2 3])                 ;Same as above
   (colors . ("red" "yellow" "green"))
-  (nested_arrays_of_ints . [(1 2) (3 4 5)])
-  (nested_mixed_array . [(1 2) ("a" "b" "c")])
   (string_array . ("all" "strings" "are the same" "type"))
-  (numbers . (0.1 0.2 0.5 1 2 5))
-  (contributors . ("Foo Bar <foo@example.com>"
-                   ((name . "Baz Qux")
-                    (email . "bazqux@example.com")
-                    (url . "https://example.com/bazqux")))))
+  (numbers . (0.1 0.2 0.5 1 2 5)))
 #+end_src
-*** TOML
+**** TOML
 #+begin_src toml
 integers = [ 1, 2, 3 ]
+integers2 = [ 1, 2, 3 ]
 colors = [ "red", "yellow", "green" ]
-nested_arrays_of_ints = [ [ 1, 2 ], [3, 4, 5] ]
-nested_mixed_array = [ [ 1, 2 ], ["a", "b", "c"] ]
 string_array = [ "all", 'strings', """are the same""", '''type''' ]
 
 # Mixed-type arrays are allowed
 numbers = [ 0.1, 0.2, 0.5, 1, 2, 5 ]
-contributors = [
-  "Foo Bar <foo@example.com>",
-  { name = "Baz Qux", email = "bazqux@example.com", url = "https://example.com/bazqux" }
-]
 #+end_src
-*** JSON Reference
+**** JSON Reference
 #+begin_src emacs-lisp :noweb yes :exports results
 (json-encode-pretty
   <<lists>>)
@@ -225,6 +215,52 @@ contributors = [
     "yellow",
     "green"
   ],
+  "string_array": [
+    "all",
+    "strings",
+    "are the same",
+    "type"
+  ],
+  "numbers": [
+    0.1,
+    0.2,
+    0.5,
+    1,
+    2,
+    5
+  ]
+}
+#+end_example
+*** Lists of lists
+**** S-expression
+#+begin_src emacs-lisp :eval no :noweb-ref lists-of-lists
+'((nested_arrays_of_ints . [(1 2) (3 4 5)])
+  (nested_mixed_array . [(1 2) ("a" "b" "c")])
+  (contributors . ("Foo Bar <foo@example.com>"
+                   ((name . "Baz Qux")
+                    (email . "bazqux@example.com")
+                    (url . "https://example.com/bazqux")))))
+#+end_src
+**** TOML
+#+begin_src toml
+nested_arrays_of_ints = [ [ 1, 2 ], [3, 4, 5] ]
+nested_mixed_array = [ [ 1, 2 ], ["a", "b", "c"] ]
+
+# Mixed-type arrays are allowed
+contributors = [
+  "Foo Bar <foo@example.com>",
+  { name = "Baz Qux", email = "bazqux@example.com", url = "https://example.com/bazqux" }
+]
+#+end_src
+**** JSON Reference
+#+begin_src emacs-lisp :noweb yes :exports results
+(json-encode-pretty
+  <<lists-of-lists>>)
+#+end_src
+
+#+RESULTS:
+#+begin_example
+{
   "nested_arrays_of_ints": [
     [
       1,
@@ -246,20 +282,6 @@ contributors = [
       "b",
       "c"
     ]
-  ],
-  "string_array": [
-    "all",
-    "strings",
-    "are the same",
-    "type"
-  ],
-  "numbers": [
-    0.1,
-    0.2,
-    0.5,
-    1,
-    2,
-    5
   ],
   "contributors": [
     "Foo Bar <foo@example.com>",
