@@ -25,6 +25,7 @@
 ;;; Code:
 
 (require 'map)
+(require 'subr-x)  ;For `string-trim' on Emacs versions 27.2 and older
 
 
 ;;; Variables
