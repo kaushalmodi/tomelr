@@ -1,6 +1,8 @@
 #+title: Emacs-Lisp Library for converting S-expressions to TOML
 #+author: Kaushal Modi
 
+#+options: H:3
+
 #+property: header-args :eval never-export
 
 *NOTE*: This library is in a severe beta stage. It is not ready for any use!! :poop:
