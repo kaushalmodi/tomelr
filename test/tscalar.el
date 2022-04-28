@@ -38,5 +38,20 @@
       (push (tomelr-encode el) out))
     (should (equal ref (nreverse out)))))
 
+;;;; Scalar - Integer
+(ert-deftest test-scalar-int ()
+  (let ((inp '(((int1 . +99))
+               ((int2 . 42))
+               ((int3 . 0))
+               ((int4 . -17))))
+        (ref '("int1 = 99"
+               "int2 = 42"
+               "int3 = 0"
+               "int4 = -17"))
+        out)
+    (dolist (el inp)
+      (push (tomelr-encode el) out))
+    (should (equal ref (nreverse out)))))
+
 
 (provide 'tscalar)

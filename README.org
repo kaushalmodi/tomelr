@@ -21,8 +21,8 @@ specification defined below.
 * Library Completion Status [0/6]
 - [-] Scalar
   - [X] Boolean
+  - [X] Integer
   - [ ] String
-  - [ ] Integer
   - [ ] Float
   - [ ] Date + Time with Offset
   - [ ] Date
@@ -47,14 +47,16 @@ https://toml.io/en/v1.0.0#boolean
   (bool2 . :false))
 #+end_src
 **** TOML
-#+begin_src emacs-lisp :noweb yes :exports results
+#+begin_src emacs-lisp :noweb yes :exports results :wrap src toml
 (tomelr-encode
   <<scalar-boolean>>)
 #+end_src
 
 #+RESULTS:
-: bool1 = true
-: bool2 = false
+#+begin_src toml
+bool1 = true
+bool2 = false
+#+end_src
 **** JSON Reference
 #+begin_src emacs-lisp :noweb yes :exports results
 (json-encode-pretty
@@ -65,6 +67,42 @@ https://toml.io/en/v1.0.0#boolean
 : {
 :   "bool1": true,
 :   "bool2": false
+: }
+*** DONE Integer
+CLOSED: [2022-04-28 Thu 17:11]
+https://toml.io/en/v1.0.0#integer
+**** S-expression
+#+begin_src emacs-lisp :eval no :noweb-ref scalar-integer
+'((int1 . +99)
+  (int2 . 42)
+  (int3 . 0)
+  (int4 . -17))
+#+end_src
+**** TOML
+#+begin_src emacs-lisp :noweb yes :exports results :wrap src toml
+(tomelr-encode
+  <<scalar-integer>>)
+#+end_src
+
+#+RESULTS:
+#+begin_src toml
+int1 = 99
+int2 = 42
+int3 = 0
+int4 = -17
+#+end_src
+**** JSON Reference
+#+begin_src emacs-lisp :noweb yes :exports results
+(json-encode-pretty
+  <<scalar-integer>>)
+#+end_src
+
+#+RESULTS:
+: {
+:   "int1": 99,
+:   "int2": 42,
+:   "int3": 0,
+:   "int4": -17
 : }
 *** String
 https://toml.io/en/v1.0.0#string
@@ -87,35 +125,6 @@ Violets are blue"""
 #+RESULTS:
 : {
 :   "str": "Roses are red\nViolets are blue"
-: }
-*** Integer
-https://toml.io/en/v1.0.0#integer
-**** S-expression
-#+begin_src emacs-lisp :eval no :noweb-ref scalar-integer
-'((int1 . +99)
-  (int2 . 42)
-  (int3 . 0)
-  (int4 . -17))
-#+end_src
-**** TOML
-#+begin_src toml
-int1 = 99
-int2 = 42
-int3 = 0
-int4 = -17
-#+end_src
-**** JSON Reference
-#+begin_src emacs-lisp :noweb yes :exports results
-(json-encode-pretty
-  <<scalar-integer>>)
-#+end_src
-
-#+RESULTS:
-: {
-:   "int1": 99,
-:   "int2": 42,
-:   "int3": 0,
-:   "int4": -17
 : }
 *** Float
 https://toml.io/en/v1.0.0#float
