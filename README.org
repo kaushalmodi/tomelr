@@ -341,22 +341,12 @@ numbers = [ 0.1, 0.2, 0.5, 1, 2, 5 ]
 **** S-expression
 #+begin_src emacs-lisp :eval no :noweb-ref array-of-arrays
 '((nested_arrays_of_ints . [(1 2) (3 4 5)])
-  (nested_mixed_array . [(1 2) ("a" "b" "c")])
-  (contributors . ("Foo Bar <foo@example.com>"
-                   ((name . "Baz Qux")
-                    (email . "bazqux@example.com")
-                    (url . "https://example.com/bazqux")))))
+  (nested_mixed_array . [(1 2) ("a" "b" "c")]))
 #+end_src
 **** TOML
 #+begin_src toml
 nested_arrays_of_ints = [ [ 1, 2 ], [3, 4, 5] ]
 nested_mixed_array = [ [ 1, 2 ], ["a", "b", "c"] ]
-
-# Mixed-type arrays are allowed
-contributors = [
-  "Foo Bar <foo@example.com>",
-  { name = "Baz Qux", email = "bazqux@example.com", url = "https://example.com/bazqux" }
-]
 #+end_src
 **** JSON Reference
 #+begin_src emacs-lisp :noweb yes :exports results
@@ -388,14 +378,6 @@ contributors = [
       "b",
       "c"
     ]
-  ],
-  "contributors": [
-    "Foo Bar <foo@example.com>",
-    {
-      "name": "Baz Qux",
-      "email": "bazqux@example.com",
-      "url": "https://example.com/bazqux"
-    }
   ]
 }
 #+end_example
@@ -589,6 +571,10 @@ See [org#Drawers](https://www.gnu.org/software/emacs/manual/html_mono/org.html#D
   (integers . (123 -5 17 1234))
   (floats . (12.3 -5.0 -1.7e-05))
   (booleans . (t :false))
+  (contributors . ("Foo Bar <foo@example.com>"
+                   ((name . "Baz Qux")
+                    (email . "bazqux@example.com")
+                    (url . "https://example.com/bazqux"))))
   (dog . ((legs . 4)
           (eyes . 2)
           (friends . ("poo" "boo"))))
@@ -644,6 +630,10 @@ strings-symbols = ["abc", "def", "two words"]
 integers = [123, -5, 17, 1_234]
 floats = [12.3, -5.0, -1.7e-05]
 booleans = [true, false]
+contributors = [
+  "Foo Bar <foo@example.com>",
+  { name = "Baz Qux", email = "bazqux@example.com", url = "https://example.com/bazqux" }
+]
 [dog]
   legs = 4
   eyes = 2
@@ -766,6 +756,14 @@ booleans = [true, false]
   "booleans": [
     true,
     false
+  ],
+  "contributors": [
+    "Foo Bar <foo@example.com>",
+    {
+      "name": "Baz Qux",
+      "email": "bazqux@example.com",
+      "url": "https://example.com/bazqux"
+    }
   ],
   "dog": {
     "legs": 4,
