@@ -99,6 +99,20 @@ Violets are blue\"\"\""
       (push (tomelr-encode el) out))
     (should (equal ref (nreverse out)))))
 
+;;;; Scalar - Date + Time
+(ert-deftest test-scalar-date-time ()
+  (let ((inp '(((odt1 . "1979-05-27T07:32:00Z"))
+               ((odt2 . "1979-05-27 07:32:00Z"))
+               ((odt3 . "1979-05-27T00:32:00-07:00"))
+               ((odt4 . "1979-05-27T00:32:00.999999+04:00"))))
+        (ref '("odt1 = 1979-05-27T07:32:00Z"
+               "odt2 = 1979-05-27 07:32:00Z"
+               "odt3 = 1979-05-27T00:32:00-07:00"
+               "odt4 = 1979-05-27T00:32:00.999999+04:00"))
+        out)
+    (dolist (el inp)
+      (push (tomelr-encode el) out))
+    (should (equal ref (nreverse out)))))
 
 
 (provide 'tscalar)

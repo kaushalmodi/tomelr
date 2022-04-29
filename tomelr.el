@@ -153,10 +153,11 @@ If TRIM-INIT-CHARS is positive, those many initial characters
 of the STRING are not inserted.
 
 Return the same STRING passed as input."
+  ;; (message "[tomelr--print-string DBG] string = `%s'" string)
   (let ((special-chars '((?b . ?\b)     ;U+0008
                          (?f . ?\f)     ;U+000C
                          (?\\ . ?\\)))
-        special-chars-re
+        (special-chars-re (rx (in ?\" ?\\ cntrl ?\u007F))) ;cntrl is same as (?\u0000 . ?\u001F)
         begin-q end-q)
     (cond
      ((string-match-p tomelr--date-time-regexp string)) ;RFC 3339 formatted date-time with offset
@@ -176,26 +177,23 @@ Return the same STRING passed as input."
       (setq begin-q "\"\"\"\n")
       (setq end-q "\"\"\""))
      (t                                 ;Basic quotation "STRING"
-      (setq special-chars-re (rx (in ?\" ?\\ cntrl ?\u007F))) ;cntrl is same as (?\u0000 . ?\u001F)
       (push '(?\" . ?\") special-chars)
       (push '(?t . ?\t) special-chars) ;U+0009
       (push '(?n . ?\n) special-chars) ;U+000A
       (push '(?r . ?\r) special-chars) ;U+000D
       (setq begin-q "\"")
       (setq end-q begin-q)))
-    ;; (message "[tomelr--print-string DBG] string = `%s'" string)
     (and begin-q (insert begin-q))
     (goto-char (prog1 (point) (princ string)))
     (and trim-init-chars (delete-char trim-init-chars))
-    (when special-chars-re
-      (while (re-search-forward special-chars-re nil :noerror)
-        (let ((char (preceding-char)))
-          (delete-char -1)
-          (insert ?\\ (or
-                       ;; Escape special characters
-                       (car (rassq char special-chars))
-                       ;; Fallback: UCS code point in \uNNNN form.
-                       (format "u%04x" char))))))
+    (while (re-search-forward special-chars-re nil :noerror)
+      (let ((char (preceding-char)))
+        (delete-char -1)
+        (insert ?\\ (or
+                     ;; Escape special characters
+                     (car (rassq char special-chars))
+                     ;; Fallback: UCS code point in \uNNNN form.
+                     (format "u%04x" char)))))
     (and end-q (insert end-q))
     string))
 

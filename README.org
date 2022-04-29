@@ -18,15 +18,15 @@ the Emacs core library [[https://git.savannah.gnu.org/cgit/emacs.git/tree/lisp/j
 
 It will then be gradually refactored so that it meets the
 specification defined below.
-* Library Completion Status [0/6]
-- [-] Scalar
+* Library Completion Status [1/7]
+- [X] Scalar
   - [X] Boolean
   - [X] Integer
   - [X] Float
   - [X] String
   - [X] Date
-  - [ ] Date + Time with Offset
-  - [ ] Nil
+  - [X] Date + Time with Offset
+- [ ] Nil
 - [ ] Arrays
 - [ ] Array of Arrays
 - [ ] Tables
@@ -208,7 +208,8 @@ ld1 = 1979-05-27
 : {
 :   "ld1": "1979-05-27"
 : }
-*** Date + Time with Offset
+*** DONE Date + Time with Offset
+CLOSED: [2022-04-28 Thu 22:55]
 https://toml.io/en/v1.0.0#offset-date-time
 **** S-expression
 #+begin_src emacs-lisp :eval no :noweb-ref scalar-odt
@@ -217,6 +218,12 @@ https://toml.io/en/v1.0.0#offset-date-time
   (odt3 . "1979-05-27T00:32:00.999999-07:00"))
 #+end_src
 **** TOML
+#+begin_src emacs-lisp :noweb yes :exports results :wrap src toml
+(tomelr-encode
+  <<scalar-odt>>)
+#+end_src
+
+#+RESULTS:
 #+begin_src toml
 odt1 = 1979-05-27T07:32:00Z
 odt2 = 1979-05-27T00:32:00-07:00
