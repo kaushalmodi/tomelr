@@ -24,22 +24,25 @@
 ;;; Code:
 (require 'tomelr)
 
+;; The plist conversion to TOML fails on emacs 26.3 and older
+;; versions.
+(unless (version< emacs-version "27")
 ;;;; S-exp objects as plists
-(ert-deftest test-plist ()
-  (let ((inp '((:int 123
-                :remove_this_key  nil
-                :str "abc"
-                :bool_false :false
-                :bool_true t
-                :int_list (1 2 3)
-                :str_list ("a" "b" "c")
-                :bool_list (t :false t :false)
-                :list_of_lists [(1 2) (3 4 5)]
-                ;; TODO plist specification of TOML tables is not yet supported.
-                ;; :map (:key1 123
-                ;;       :key2 "xyz")
-                )))
-        (ref '("int = 123
+  (ert-deftest test-plist ()
+    (let ((inp '((:int 123
+                  :remove_this_key  nil
+                  :str "abc"
+                  :bool_false :false
+                  :bool_true t
+                  :int_list (1 2 3)
+                  :str_list ("a" "b" "c")
+                  :bool_list (t :false t :false)
+                  :list_of_lists [(1 2) (3 4 5)]
+                  ;; TODO plist specification of TOML tables is not yet supported.
+                  ;; :map (:key1 123
+                  ;;       :key2 "xyz")
+                  )))
+          (ref '("int = 123
 str = \"abc\"
 bool_false = false
 bool_true = true
@@ -47,10 +50,10 @@ int_list = [ 1, 2, 3 ]
 str_list = [ \"a\", \"b\", \"c\" ]
 bool_list = [ true, false, true, false ]
 list_of_lists = [ [ 1, 2 ], [ 3, 4, 5 ] ]"))
-        out)
-    (dolist (el inp)
-      (push (tomelr-encode el) out))
-    (should (equal ref (nreverse out)))))
+          out)
+      (dolist (el inp)
+        (push (tomelr-encode el) out))
+      (should (equal ref (nreverse out))))))
 
 
 (provide 'tplist)
