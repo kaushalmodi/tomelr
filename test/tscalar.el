@@ -74,5 +74,21 @@
       (push (tomelr-encode el) out))
     (should (equal ref (nreverse out)))))
 
+;;;; Scalar - String
+(ert-deftest test-scalar-string ()
+  (let ((inp '(((string1 . "Roses are red"))
+               ((string2 . "Roses are red\nViolets are blue")) ;Newline in string
+               ((string3 . "\"Hello!\"")))) ;Quote in string
+        (ref '("string1 = \"Roses are red\""
+               "string2 = \"\"\"
+Roses are red
+Violets are blue\"\"\""
+               "string3 = \"\"\"
+\"Hello!\"\"\"\""))
+        out)
+    (dolist (el inp)
+      (push (tomelr-encode el) out))
+    (should (equal ref (nreverse out)))))
+
 
 (provide 'tscalar)

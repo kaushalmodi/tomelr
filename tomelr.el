@@ -130,35 +130,56 @@ Return nil if KEYWORD is not recognized as a TOML keyword."
     (and keyword (insert keyword))))
 
 ;;;; Strings
-(defconst tomelr-special-chars
-  '((?\" . ?\")
-    (?\\ . ?\\)
-    (?b . ?\b)
-    (?f . ?\f)
-    (?n . ?\n)
-    (?r . ?\r)
-    (?t . ?\t))
-  "Characters which are escaped in TOML, with their Elisp counterparts.")
-
-(defun tomelr--print-string (string &optional from)
+(defun tomelr--print-string (string &optional trim-init-chars)
   "Insert a TOML representation of STRING at point.
-FROM is the index of STRING to start from and defaults to 0."
-  ;; (message "[tomelr--print-string DBG] string = %s" string)
-  (insert ?\")
-  (goto-char (prog1 (point) (princ string)))
-  (and from (delete-char from))
-  ;; Escape only quotation mark, backslash, and the control
-  ;; characters U+0000 to U+001F (RFC 4627, ECMA-404).
-  (while (re-search-forward (rx (in ?\" ?\\ cntrl)) nil 'move)
-    (let ((char (preceding-char)))
-      (delete-char -1)
-      (insert ?\\ (or
-                   ;; Special TOML character (\n, \r, etc.).
-                   (car (rassq char tomelr-special-chars))
-                   ;; Fallback: UCS code point in \uNNNN form.
-                   (format "u%04x" char)))))
-  (insert ?\")
-  string)
+
+If TRIM-INIT-CHARS is positive, those many initial characters
+of the STRING are not inserted.
+
+Return the same STRING passed as input."
+  (let ((special-chars '((?b . ?\b)     ;U+0008
+                         (?f . ?\f)     ;U+000C
+                         (?\\ . ?\\)))
+        special-chars-re
+        begin-q end-q)
+    ;; Use multi-line string quotation if the string contains a " char
+    ;; or a newline.
+    (if (string-match-p "\n\\|\"" string)
+        (progn                          ;Triple quotation """STRING"""
+          ;; From https://toml.io/en/v1.0.0#string, Any Unicode
+          ;; character may be used except those that must be escaped:
+          ;; backslash and the control characters other than tab, line
+          ;; feed, and carriage return (U+0000 to U+0008, U+000B,
+          ;; U+000C, U+000E to U+001F, U+007F).
+          (setq special-chars-re (rx (in ?\\
+                                         (?\u0000 . ?\u0008)
+                                         ?\u000B ?\u000C
+                                         (?\u000E . ?\u001F)
+                                         ?\u007F)))
+          (setq begin-q "\"\"\"\n")
+          (setq end-q "\"\"\""))
+      (progn                            ;Basic quotation "STRING"
+        (setq special-chars-re (rx (in ?\" ?\\ cntrl ?\u007F))) ;cntrl is same as (?\u0000 . ?\u001F)
+        (push '(?\" . ?\") special-chars)
+        (push '(?t . ?\t) special-chars) ;U+0009
+        (push '(?n . ?\n) special-chars) ;U+000A
+        (push '(?r . ?\r) special-chars) ;U+000D
+        (setq begin-q "\"")
+        (setq end-q begin-q)))
+    ;; (message "[tomelr--print-string DBG] string = `%s'" string)
+    (insert begin-q)
+    (goto-char (prog1 (point) (princ string)))
+    (and trim-init-chars (delete-char trim-init-chars))
+    (while (re-search-forward special-chars-re nil :noerror)
+      (let ((char (preceding-char)))
+        (delete-char -1)
+        (insert ?\\ (or
+                     ;; Escape special characters
+                     (car (rassq char special-chars))
+                     ;; Fallback: UCS code point in \uNNNN form.
+                     (format "u%04x" char)))))
+    (insert end-q)
+    string))
 
 (defun tomelr-encode-string (string)
   "Return a TOML representation of STRING."

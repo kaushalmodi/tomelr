@@ -23,7 +23,7 @@ specification defined below.
   - [X] Boolean
   - [X] Integer
   - [X] Float
-  - [ ] String
+  - [X] String
   - [ ] Date + Time with Offset
   - [ ] Date
   - [ ] Nil
@@ -149,15 +149,24 @@ flt7 = 6.626e-34
 :   "flt6": -0.02,
 :   "flt7": 6.626e-34
 : }
-*** String
+*** DONE String
+CLOSED: [2022-04-28 Thu 22:10]
 https://toml.io/en/v1.0.0#string
 **** S-expression
 #+begin_src emacs-lisp :eval no :noweb-ref scalar-string
-'((str . "Roses are red\nViolets are blue"))
+'((str1 . "Roses are red")
+  (str2 . "Roses are red\nViolets are blue"))
 #+end_src
 **** TOML
+#+begin_src emacs-lisp :noweb yes :exports results :wrap src toml
+(tomelr-encode
+  <<scalar-string>>)
+#+end_src
+
+#+RESULTS:
 #+begin_src toml
-str = """
+str1 = "Roses are red"
+str2 = """
 Roses are red
 Violets are blue"""
 #+end_src
@@ -169,7 +178,8 @@ Violets are blue"""
 
 #+RESULTS:
 : {
-:   "str": "Roses are red\nViolets are blue"
+:   "str1": "Roses are red",
+:   "str2": "Roses are red\nViolets are blue"
 : }
 *** Date + Time with Offset
 https://toml.io/en/v1.0.0#offset-date-time
