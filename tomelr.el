@@ -249,20 +249,21 @@ Signal `tomelr-key-format' if it cannot be encoded as a string."
       (signal 'tomelr-key-format (list key))))
 
 ;;;; Objects
+(defun tomelr--toml-table-p (object)
+  "Return non-nil if OBJECT can represent a TOML Table."
+  ;; TODO: Need to find a robust way of detecting TOML tables.
+  ;; (message "[tomelr--print-pair DBG] object type = %S" (type-of object))
+  (and (mapp object)
+       (consp object)         ;      object = ((KEY . VAL)) <- cons
+       (consp (car object)))) ;(car object) =  (KEY . VAL)  <- also cons
+
 (defun tomelr--print-pair (key val)
   "Insert TOML representation of KEY - VAL pair at point."
   (let ((type (cond
-               ;; TODO: Need to find a robust way of detecting TOML tables.
-               ((and (mapp val)
-                     (consp val)       ;      val = ((KEY . VAL)) <- cons
-                     (consp (car val)) ;(car val) = (KEY . VAL)   <- also cons
-                     )
-                'table)
-               (t
-                nil))))
+               ((tomelr--toml-table-p val) 'table)
+               (t nil))))
     ;; (message "[tomelr--print-pair DBG] key = %S, val = %S, type = %S"
     ;;          key val type)
-    ;; (message "[tomelr--print-pair DBG] val type = %S" (type-of val))
     (when val                     ;Don't print the key if val is nil
       (tomelr--print-indentation) ;Newline before each key in a key-value pair
       (tomelr--print-key key type)
