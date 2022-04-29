@@ -60,6 +60,22 @@ Dictates repetitions of `tomelr-encoding-default-indentation'.")
 (defvar tomelr--print-keyval-separator " = "
   "String used to separate key-value pairs during encoding.")
 
+(defvar tomelr--date-time-regexp
+  (concat "\\`[[:digit:]]\\{4\\}-[[:digit:]]\\{2\\}-[[:digit:]]\\{2\\}"
+          "\\(?:[T ][[:digit:]]\\{2\\}:[[:digit:]]\\{2\\}:[[:digit:]]\\{2\\}\\(?:\\.[[:digit:]]+\\)*"
+          "\\(?:Z\\|[+-][[:digit:]]\\{2\\}:[[:digit:]]\\{2\\}\\)*\\)*\\'")
+  "Regexp to match RFC 3339 formatted date-time with offset.
+
+- https://toml.io/en/v1.0.0#offset-date-time
+- https://tools.ietf.org/html/rfc3339#section-5.8
+
+Examples:
+  1979-05-27
+  1979-05-27T07:32:00Z
+  1979-05-27 07:32:00Z
+  1979-05-27T00:32:00-07:00
+  1979-05-27T00:32:00.999999+04:00.")
+
 
 
 ;;; Error conditions
@@ -142,43 +158,45 @@ Return the same STRING passed as input."
                          (?\\ . ?\\)))
         special-chars-re
         begin-q end-q)
-    ;; Use multi-line string quotation if the string contains a " char
-    ;; or a newline.
-    (if (string-match-p "\n\\|\"" string)
-        (progn                          ;Triple quotation """STRING"""
-          ;; From https://toml.io/en/v1.0.0#string, Any Unicode
-          ;; character may be used except those that must be escaped:
-          ;; backslash and the control characters other than tab, line
-          ;; feed, and carriage return (U+0000 to U+0008, U+000B,
-          ;; U+000C, U+000E to U+001F, U+007F).
-          (setq special-chars-re (rx (in ?\\
-                                         (?\u0000 . ?\u0008)
-                                         ?\u000B ?\u000C
-                                         (?\u000E . ?\u001F)
-                                         ?\u007F)))
-          (setq begin-q "\"\"\"\n")
-          (setq end-q "\"\"\""))
-      (progn                            ;Basic quotation "STRING"
-        (setq special-chars-re (rx (in ?\" ?\\ cntrl ?\u007F))) ;cntrl is same as (?\u0000 . ?\u001F)
-        (push '(?\" . ?\") special-chars)
-        (push '(?t . ?\t) special-chars) ;U+0009
-        (push '(?n . ?\n) special-chars) ;U+000A
-        (push '(?r . ?\r) special-chars) ;U+000D
-        (setq begin-q "\"")
-        (setq end-q begin-q)))
+    (cond
+     ((string-match-p tomelr--date-time-regexp string)) ;RFC 3339 formatted date-time with offset
+     ;; Use multi-line string quotation if the string contains a " char
+     ;; or a newline - """STRING"""
+     ((string-match-p "\n\\|\"" string)
+      ;; From https://toml.io/en/v1.0.0#string, Any Unicode
+      ;; character may be used except those that must be escaped:
+      ;; backslash and the control characters other than tab, line
+      ;; feed, and carriage return (U+0000 to U+0008, U+000B,
+      ;; U+000C, U+000E to U+001F, U+007F).
+      (setq special-chars-re (rx (in ?\\
+                                     (?\u0000 . ?\u0008)
+                                     ?\u000B ?\u000C
+                                     (?\u000E . ?\u001F)
+                                     ?\u007F)))
+      (setq begin-q "\"\"\"\n")
+      (setq end-q "\"\"\""))
+     (t                                 ;Basic quotation "STRING"
+      (setq special-chars-re (rx (in ?\" ?\\ cntrl ?\u007F))) ;cntrl is same as (?\u0000 . ?\u001F)
+      (push '(?\" . ?\") special-chars)
+      (push '(?t . ?\t) special-chars) ;U+0009
+      (push '(?n . ?\n) special-chars) ;U+000A
+      (push '(?r . ?\r) special-chars) ;U+000D
+      (setq begin-q "\"")
+      (setq end-q begin-q)))
     ;; (message "[tomelr--print-string DBG] string = `%s'" string)
-    (insert begin-q)
+    (and begin-q (insert begin-q))
     (goto-char (prog1 (point) (princ string)))
     (and trim-init-chars (delete-char trim-init-chars))
-    (while (re-search-forward special-chars-re nil :noerror)
-      (let ((char (preceding-char)))
-        (delete-char -1)
-        (insert ?\\ (or
-                     ;; Escape special characters
-                     (car (rassq char special-chars))
-                     ;; Fallback: UCS code point in \uNNNN form.
-                     (format "u%04x" char)))))
-    (insert end-q)
+    (when special-chars-re
+      (while (re-search-forward special-chars-re nil :noerror)
+        (let ((char (preceding-char)))
+          (delete-char -1)
+          (insert ?\\ (or
+                       ;; Escape special characters
+                       (car (rassq char special-chars))
+                       ;; Fallback: UCS code point in \uNNNN form.
+                       (format "u%04x" char))))))
+    (and end-q (insert end-q))
     string))
 
 (defun tomelr-encode-string (string)

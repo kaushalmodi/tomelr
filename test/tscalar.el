@@ -90,5 +90,15 @@ Violets are blue\"\"\""
       (push (tomelr-encode el) out))
     (should (equal ref (nreverse out)))))
 
+;;;; Scalar - Local Date
+(ert-deftest test-scalar-date ()
+  (let ((inp '(((date . "1979-05-27"))))
+        (ref '("date = 1979-05-27"))
+        out)
+    (dolist (el inp)
+      (push (tomelr-encode el) out))
+    (should (equal ref (nreverse out)))))
+
+
 
 (provide 'tscalar)

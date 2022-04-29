@@ -24,8 +24,8 @@ specification defined below.
   - [X] Integer
   - [X] Float
   - [X] String
+  - [X] Date
   - [ ] Date + Time with Offset
-  - [ ] Date
   - [ ] Nil
 - [ ] Arrays
 - [ ] Array of Arrays
@@ -181,6 +181,33 @@ Violets are blue"""
 :   "str1": "Roses are red",
 :   "str2": "Roses are red\nViolets are blue"
 : }
+*** DONE Date
+CLOSED: [2022-04-28 Thu 22:40]
+https://toml.io/en/v1.0.0#local-date
+**** S-expression
+#+begin_src emacs-lisp :eval no :noweb-ref scalar-date
+'((ld1 . "1979-05-27"))
+#+end_src
+**** TOML
+#+begin_src emacs-lisp :noweb yes :exports results :wrap src toml
+(tomelr-encode
+  <<scalar-date>>)
+#+end_src
+
+#+RESULTS:
+#+begin_src toml
+ld1 = 1979-05-27
+#+end_src
+**** JSON Reference
+#+begin_src emacs-lisp :noweb yes :exports results
+(json-encode-pretty
+  <<scalar-date>>)
+#+end_src
+
+#+RESULTS:
+: {
+:   "ld1": "1979-05-27"
+: }
 *** Date + Time with Offset
 https://toml.io/en/v1.0.0#offset-date-time
 **** S-expression
@@ -206,26 +233,6 @@ odt3 = 1979-05-27T00:32:00.999999-07:00
 :   "odt1": "1979-05-27T07:32:00Z",
 :   "odt2": "1979-05-27T00:32:00-07:00",
 :   "odt3": "1979-05-27T00:32:00.999999-07:00"
-: }
-*** Date
-https://toml.io/en/v1.0.0#local-date
-**** S-expression
-#+begin_src emacs-lisp :eval no :noweb-ref scalar-date
-'((ld1 . "1979-05-27"))
-#+end_src
-**** TOML
-#+begin_src toml
-ld1 = 1979-05-27
-#+end_src
-**** JSON Reference
-#+begin_src emacs-lisp :noweb yes :exports results
-(json-encode-pretty
-  <<scalar-date>>)
-#+end_src
-
-#+RESULTS:
-: {
-:   "ld1": "1979-05-27"
 : }
 ** TOML Arrays: Lists
 https://toml.io/en/v1.0.0#array
