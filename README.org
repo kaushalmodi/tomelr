@@ -528,28 +528,6 @@ See [org#Drawers](https://www.gnu.org/software/emacs/manual/html_mono/org.html#D
   timestamp = 2018-09-06T11:37:00-04:00
   note = "A note `mono`."
 #+end_src
-
-#+begin_src toml
-[[products]]
-  name = "Hammer"
-  sku = 738594937
-[[products]]  # empty table within the array
-[[products]]
-  name = "Nail"
-  sku = 284758393
-  color = "gray"
-
-[[org_logbook]]
-  timestamp = 2022-04-08T14:53:00-04:00
-  note = """This note addition prompt shows up on typing the `C-c C-z` binding.
-See [org#Drawers](https://www.gnu.org/software/emacs/manual/html_mono/org.html#Drawers)."""
-[[org_logbook]]
-  timestamp = 2018-09-06T11:45:00-04:00
-  note = """Another note **bold** _italics_."""
-[[org_logbook]]
-  timestamp = 2018-09-06T11:37:00-04:00
-  note = """A note `mono`."""
-#+end_src
 **** JSON Reference
 #+begin_src emacs-lisp :noweb yes :exports results
 (json-encode-pretty
