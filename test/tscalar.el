@@ -29,10 +29,12 @@
 (ert-deftest test-scalar-bool ()
   (let ((inp '(((bool1 . t))
                ((bool2 . :false))
-               ((bool3 . "false"))))
+               ((bool3 . 'false))
+               ((bool4 . "false"))))
         (ref '("bool1 = true"
                "bool2 = false"
-               "bool3 = false"))
+               "bool3 = false"
+               "bool4 = false"))
         out)
     (dolist (el inp)
       (push (tomelr-encode el) out))
