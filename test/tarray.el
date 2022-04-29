@@ -24,7 +24,7 @@
 ;;; Code:
 (require 'tomelr)
 
-;;;; Key with array value
+;;;; Simple arrays
 (ert-deftest test-array ()
   (let ((inp '(((integers . (1 2 3)))
                ((integers2 . [1 2 3]))    ;Same as above
@@ -34,6 +34,17 @@
                "integers2 = [ 1, 2, 3 ]"
                "colors = [ \"red\", \"yellow\", \"green\" ]"
                "numbers = [ 0.1, 0.2, 0.5, 1, 2, 5 ]"))
+        out)
+    (dolist (el inp)
+      (push (tomelr-encode el) out))
+    (should (equal ref (nreverse out)))))
+
+;;;; Array of arrays
+(ert-deftest test-array-of-arrays ()
+  (let ((inp '(((nested_arrays_of_ints . [(1 2) (3 4 5)]))
+               ((nested_mixed_array . [(1 2) ("a" "b" "c")]))))
+        (ref '("nested_arrays_of_ints = [ [ 1, 2 ], [ 3, 4, 5 ] ]"
+               "nested_mixed_array = [ [ 1, 2 ], [ \"a\", \"b\", \"c\" ] ]"))
         out)
     (dolist (el inp)
       (push (tomelr-encode el) out))
