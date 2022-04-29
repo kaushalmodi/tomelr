@@ -18,7 +18,7 @@ the Emacs core library [[https://git.savannah.gnu.org/cgit/emacs.git/tree/lisp/j
 
 It will then be gradually refactored so that it meets the
 specification defined below.
-* Library Completion Status [4/7]
+* Library Completion Status [5/7]
 - [X] Scalar
   - [X] Boolean
   - [X] Integer
@@ -29,9 +29,9 @@ specification defined below.
 - [X] Nil
 - [X] Arrays
 - [X] Array of Arrays
-- [-] Tables
+- [X] Tables
   - [X] Basic Tables
-  - [ ] Nested Tables
+  - [X] Nested Tables
 - [ ] Array of Tables
   - [ ] Basic Array of Tables
   - [ ] Nested Array of Tables
@@ -436,7 +436,8 @@ CLOSED: [2022-04-29 Fri 13:41]
   }
 }
 #+end_example
-*** Nested TOML Tables
+*** DONE Nested TOML Tables
+CLOSED: [2022-04-29 Fri 14:30]
 **** S-expression
 #+begin_src emacs-lisp :eval no :noweb-ref nested-tables
 '((table-1 . ((table-1a . ((key1 . "some string")
@@ -445,6 +446,12 @@ CLOSED: [2022-04-29 Fri 13:41]
                            (key2 . 98765))))))
 #+end_src
 **** TOML
+#+begin_src emacs-lisp :noweb yes :exports results :wrap src toml
+(tomelr-encode
+  <<nested-tables>>)
+#+end_src
+
+#+RESULTS:
 #+begin_src toml
 [table-1]
   [table-1.table-1a]

@@ -52,6 +52,9 @@ ordered alphabetically.")
   "Current indentation level during encoding.
 Dictates repetitions of `tomelr-encoding-default-indentation'.")
 
+(defvar tomelr--print-table-hierarchy ()
+  "Internal variable used to save the TOML table hierarchy.")
+
 (defvar tomelr--print-keyval-separator " = "
   "String used to separate key-value pairs during encoding.")
 
@@ -211,12 +214,27 @@ Return nil if OBJECT cannot be encoded as a TOML string."
          ;; (message "[tomelr--print-stringlike DBG] %S is keyword" object)
          (tomelr--print-string (symbol-name object) 1))
         ((symbolp object)
-         ;; (message "[tomelr--print-stringlike DBG] %S is symbol" object)
-         (cond
-          ((equal type 'table)
-           (princ (format "[%s]" (symbol-name object))))
-          (t
-           (princ (symbol-name object)))))))
+         (let ((sym-name (symbol-name object)))
+           ;; (message "[tomelr--print-stringlike DBG] %S is symbol, type = %S, depth = %d"
+           ;;          object type tomelr--print-indentation-depth)
+           (cond
+            ((equal type 'table)
+             (if (null (nth tomelr--print-indentation-depth tomelr--print-table-hierarchy))
+                 (progn
+                   (push sym-name tomelr--print-table-hierarchy)
+                   (setq tomelr--print-table-hierarchy (nreverse tomelr--print-table-hierarchy)))
+               ;; Throw away table keys collected at higher depths, if
+               ;; any, from earlier runs of this function.
+               (setq tomelr--print-table-hierarchy
+                     (seq-take tomelr--print-table-hierarchy
+                               (1+ tomelr--print-indentation-depth)))
+               (setf (nth tomelr--print-indentation-depth tomelr--print-table-hierarchy)
+                     sym-name))
+             ;; (message "[tomelr--print-stringlike DBG] table hier: %S"
+             ;;          tomelr--print-table-hierarchy)
+             (princ (format "[%s]" (string-join tomelr--print-table-hierarchy "."))))
+            (t
+             (princ sym-name)))))))
 
 (defun tomelr--print-key (key &optional type)
   "Insert a TOML key representation of KEY at point.

@@ -41,5 +41,23 @@
       (push (tomelr-encode el) out))
     (should (equal ref (nreverse out)))))
 
+;;;; Nested tables
+(ert-deftest test-nested-table ()
+  (let ((inp '(((table-1 . ((table-1a . ((key1 . "some string")
+                                         (key2 . 123)))
+                            (table-1b . ((key1 . "foo")
+                                         (key2 . 98765))))))))
+        (ref '("[table-1]
+  [table-1.table-1a]
+    key1 = \"some string\"
+    key2 = 123
+  [table-1.table-1b]
+    key1 = \"foo\"
+    key2 = 98765"))
+        out)
+    (dolist (el inp)
+      (push (tomelr-encode el) out))
+    (should (equal ref (nreverse out)))))
+
 
 (provide 'ttable)
