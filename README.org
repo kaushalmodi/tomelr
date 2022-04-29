@@ -30,7 +30,11 @@ specification defined below.
 - [X] Arrays
 - [X] Array of Arrays
 - [ ] Tables
+  - [ ] Basic Tables
+  - [ ] Nested Tables
 - [ ] Array of Tables
+  - [ ] Basic Array of Tables
+  - [ ] Nested Array of Tables
 - [ ] Property Lists
 * Specification and Conversion Examples
 [[https://scripter.co/defining-tomelr/][Companion blog post]]
@@ -389,14 +393,15 @@ nested_mixed_array = [ [ 1, 2 ], [ "a", "b", "c" ] ]
 }
 #+end_example
 ** TOML Tables: Maps or Dictionaries or Hash Tables
-*** S-expression
+*** Basic TOML Tables
+**** S-expression
 #+begin_src emacs-lisp :eval no :noweb-ref tables
 '((table-1 . ((key1 . "some string")
               (key2 . 123)))
   (table-2 . ((key1 . "another string")
               (key2 . 456))))
 #+end_src
-*** TOML
+**** TOML
 #+begin_src toml
 [table-1]
   key1 = "some string"
@@ -406,7 +411,7 @@ nested_mixed_array = [ [ 1, 2 ], [ "a", "b", "c" ] ]
   key1 = "another string"
   key2 = 456
 #+end_src
-*** JSON Reference
+**** JSON Reference
 #+begin_src emacs-lisp :noweb yes :exports results
 (json-encode-pretty
   <<tables>>)
@@ -425,8 +430,48 @@ nested_mixed_array = [ [ 1, 2 ], [ "a", "b", "c" ] ]
   }
 }
 #+end_example
+*** Nested TOML Tables
+**** S-expression
+#+begin_src emacs-lisp :eval no :noweb-ref nested-tables
+'((table-1 . ((table-1a . ((key1 . "some string")
+                           (key2 . 123)))
+              (table-1b . ((key1 . "foo")
+                           (key2 . 98765))))))
+#+end_src
+**** TOML
+#+begin_src toml
+[table-1]
+  [table-1.table-1a]
+    key1 = "some string"
+    key2 = 123
+  [table-1.table-1b]
+    key1 = "foo"
+    key2 = 98765
+#+end_src
+**** JSON Reference
+#+begin_src emacs-lisp :noweb yes :exports results
+(json-encode-pretty
+  <<nested-tables>>)
+#+end_src
+
+#+RESULTS:
+#+begin_example
+{
+  "table-1": {
+    "table-1a": {
+      "key1": "some string",
+      "key2": 123
+    },
+    "table-1b": {
+      "key1": "foo",
+      "key2": 98765
+    }
+  }
+}
+#+end_example
 ** TOML Array of Tables: Lists of Maps
-*** S-expression
+*** Basic Array of Tables
+**** S-expression
 #+begin_src emacs-lisp :eval no :noweb-ref table-arrays
 '((products . (((name . "Hammer")
                 (sku . 738594937))
@@ -434,16 +479,6 @@ nested_mixed_array = [ [ 1, 2 ], [ "a", "b", "c" ] ]
                ((name . "Nail")
                 (sku . 284758393)
                 (color . "gray"))))
-
-  (fruits . (((name . "apple")
-              (physical . ((color . "red")
-                           (shape . "round")))
-              (varieties . ((((name . "red delicious"))
-                             ((name . "granny smith"))))))
-             ((name . "banana")
-              (varieties . (((name . "plantain")))))))
-
-
   (org_logbook . (((timestamp . 2022-04-08T14:53:00-04:00)
                    (note . "This note addition prompt shows up on typing the `C-c C-z` binding.\nSee [org#Drawers](https://www.gnu.org/software/emacs/manual/html_mono/org.html#Drawers)."))
                   ((timestamp . 2018-09-06T11:45:00-04:00)
@@ -451,7 +486,7 @@ nested_mixed_array = [ [ 1, 2 ], [ "a", "b", "c" ] ]
                   ((timestamp . 2018-09-06T11:37:00-04:00)
                    (note . "A note `mono`.")))))
 #+end_src
-*** TOML
+**** TOML
 #+begin_src toml
 [[products]]
   name = "Hammer"
@@ -461,20 +496,6 @@ nested_mixed_array = [ [ 1, 2 ], [ "a", "b", "c" ] ]
   name = "Nail"
   sku = 284758393
   color = "gray"
-
-[[fruits]]
-  name = "apple"
-  [fruits.physical]  # subtable
-    color = "red"
-    shape = "round"
-  [[fruits.varieties]]  # nested array of tables
-    name = "red delicious"
-  [[fruits.varieties]]
-    name = "granny smith"
-[[fruits]]
-  name = "banana"
-  [[fruits.varieties]]
-    name = "plantain"
 
 [[org_logbook]]
   timestamp = 2022-04-08T14:53:00-04:00
@@ -487,7 +508,7 @@ See [org#Drawers](https://www.gnu.org/software/emacs/manual/html_mono/org.html#D
   timestamp = 2018-09-06T11:37:00-04:00
   note = """A note `mono`."""
 #+end_src
-*** JSON Reference
+**** JSON Reference
 #+begin_src emacs-lisp :noweb yes :exports results
 (json-encode-pretty
   <<table-arrays>>)
@@ -508,6 +529,58 @@ See [org#Drawers](https://www.gnu.org/software/emacs/manual/html_mono/org.html#D
       "color": "gray"
     }
   ],
+  "org_logbook": [
+    {
+      "timestamp": "2022-04-08T14:53:00-04:00",
+      "note": "This note addition prompt shows up on typing the `C-c C-z` binding.\nSee [org#Drawers](https://www.gnu.org/software/emacs/manual/html_mono/org.html#Drawers)."
+    },
+    {
+      "timestamp": "2018-09-06T11:45:00-04:00",
+      "note": "Another note **bold** _italics_."
+    },
+    {
+      "timestamp": "2018-09-06T11:37:00-04:00",
+      "note": "A note `mono`."
+    }
+  ]
+}
+#+end_example
+*** Nested Array of Tables
+**** S-expression
+#+begin_src emacs-lisp :eval no :noweb-ref nested-table-arrays
+'((fruits . (((name . "apple")
+              (physical . ((color . "red")
+                           (shape . "round")))
+              (varieties . ((((name . "red delicious"))
+                             ((name . "granny smith"))))))
+             ((name . "banana")
+              (varieties . (((name . "plantain"))))))))
+#+end_src
+**** TOML
+#+begin_src toml
+[[fruits]]
+  name = "apple"
+  [fruits.physical]  # subtable
+    color = "red"
+    shape = "round"
+  [[fruits.varieties]]  # nested array of tables
+    name = "red delicious"
+  [[fruits.varieties]]
+    name = "granny smith"
+[[fruits]]
+  name = "banana"
+  [[fruits.varieties]]
+    name = "plantain"
+#+end_src
+**** JSON Reference
+#+begin_src emacs-lisp :noweb yes :exports results
+(json-encode-pretty
+  <<nested-table-arrays>>)
+#+end_src
+
+#+RESULTS:
+#+begin_example
+{
   "fruits": [
     {
       "name": "apple",
@@ -534,23 +607,10 @@ See [org#Drawers](https://www.gnu.org/software/emacs/manual/html_mono/org.html#D
         }
       ]
     }
-  ],
-  "org_logbook": [
-    {
-      "timestamp": "2022-04-08T14:53:00-04:00",
-      "note": "This note addition prompt shows up on typing the `C-c C-z` binding.\nSee [org#Drawers](https://www.gnu.org/software/emacs/manual/html_mono/org.html#Drawers)."
-    },
-    {
-      "timestamp": "2018-09-06T11:45:00-04:00",
-      "note": "Another note **bold** _italics_."
-    },
-    {
-      "timestamp": "2018-09-06T11:37:00-04:00",
-      "note": "A note `mono`."
-    }
   ]
 }
 #+end_example
+
 ** Combinations of all of the above
 *** S-expression
 #+begin_src emacs-lisp :eval no :noweb-ref medley
