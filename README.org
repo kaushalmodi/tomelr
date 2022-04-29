@@ -18,7 +18,7 @@ the Emacs core library [[https://git.savannah.gnu.org/cgit/emacs.git/tree/lisp/j
 
 It will then be gradually refactored so that it meets the
 specification defined below.
-* Library Completion Status [2/7]
+* Library Completion Status [3/7]
 - [X] Scalar
   - [X] Boolean
   - [X] Integer
@@ -27,7 +27,7 @@ specification defined below.
   - [X] Date
   - [X] Date + Time with Offset
 - [X] Nil
-- [ ] Arrays
+- [X] Arrays
 - [ ] Array of Arrays
 - [ ] Tables
 - [ ] Array of Tables
@@ -280,29 +280,33 @@ key5 = true
 : }
 ** TOML Arrays: Lists
 https://toml.io/en/v1.0.0#array
-*** Lists
+*** DONE Plain Arrays
+CLOSED: [2022-04-29 Fri 00:25]
 **** S-expression
-#+begin_src emacs-lisp :eval no :noweb-ref lists
+#+begin_src emacs-lisp :eval no :noweb-ref arrays
 '((integers . (1 2 3))
   (integers2 . [1 2 3])                 ;Same as above
   (colors . ("red" "yellow" "green"))
-  (string_array . ("all" "strings" "are the same" "type"))
+  ;; Mixed-type arrays are allowed
   (numbers . (0.1 0.2 0.5 1 2 5)))
 #+end_src
 **** TOML
+#+begin_src emacs-lisp :noweb yes :exports results :wrap src toml
+(tomelr-encode
+  <<arrays>>)
+#+end_src
+
+#+RESULTS:
 #+begin_src toml
 integers = [ 1, 2, 3 ]
 integers2 = [ 1, 2, 3 ]
 colors = [ "red", "yellow", "green" ]
-string_array = [ "all", 'strings', """are the same""", '''type''' ]
-
-# Mixed-type arrays are allowed
 numbers = [ 0.1, 0.2, 0.5, 1, 2, 5 ]
 #+end_src
 **** JSON Reference
 #+begin_src emacs-lisp :noweb yes :exports results
 (json-encode-pretty
-  <<lists>>)
+  <<arrays>>)
 #+end_src
 
 #+RESULTS:
@@ -323,12 +327,6 @@ numbers = [ 0.1, 0.2, 0.5, 1, 2, 5 ]
     "yellow",
     "green"
   ],
-  "string_array": [
-    "all",
-    "strings",
-    "are the same",
-    "type"
-  ],
   "numbers": [
     0.1,
     0.2,
@@ -339,9 +337,9 @@ numbers = [ 0.1, 0.2, 0.5, 1, 2, 5 ]
   ]
 }
 #+end_example
-*** Lists of lists
+*** Array of Arrays
 **** S-expression
-#+begin_src emacs-lisp :eval no :noweb-ref lists-of-lists
+#+begin_src emacs-lisp :eval no :noweb-ref array-of-arrays
 '((nested_arrays_of_ints . [(1 2) (3 4 5)])
   (nested_mixed_array . [(1 2) ("a" "b" "c")])
   (contributors . ("Foo Bar <foo@example.com>"
@@ -363,7 +361,7 @@ contributors = [
 **** JSON Reference
 #+begin_src emacs-lisp :noweb yes :exports results
 (json-encode-pretty
-  <<lists-of-lists>>)
+  <<array-of-arrays>>)
 #+end_src
 
 #+RESULTS:

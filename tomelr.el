@@ -37,11 +37,6 @@
   "String used for a single indentation level during encoding.
 This value is repeated for each further nested element.")
 
-(defvar tomelr-encoding-lisp-style-closings nil
-  "If non-nil, delimiters ] and } will be formatted Lisp-style.
-This means they will be placed on the same line as the last
-element of the respective array or object, without indentation.")
-
 (defvar tomelr-encoding-object-sort-predicate nil
   "Sorting predicate for TOML object keys during encoding.
 If nil, no sorting is performed.  Else, TOML object keys are
@@ -281,21 +276,17 @@ non-nil.  Sorting can optionally be DESTRUCTIVE for speed."
 ;;;; Arrays
 (defun tomelr--print-array (array)
   "Like `tomelr-encode-array', but insert the TOML at point."
-  (insert ?\[)
+  (insert "[ ")
   (unless (length= array 0)
     (tomelr--with-indentation
-      (tomelr--print-indentation)
       (let ((first t))
         (mapc (lambda (elt)
                 (if first
                     (setq first nil)
-                  (insert ",")
-                  (tomelr--print-indentation))
+                  (insert ", "))
                 (tomelr--print elt))
-              array)))
-    (or tomelr-encoding-lisp-style-closings
-        (tomelr--print-indentation)))
-  (insert ?\]))
+              array))))
+  (insert " ]"))
 
 (defun tomelr-encode-array (array)
   "Return a TOML representation of ARRAY.
