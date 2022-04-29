@@ -147,7 +147,9 @@ Return nil if KEYWORD is not recognized as a TOML keyword."
 If TRIM-INIT-CHARS is positive, those many initial characters
 of the STRING are not inserted.
 
-Return the same STRING passed as input."
+Return the same STRING passed as input.  See
+`tomelr-encode-string' instead if you need a function that
+returns the TOML representation as a string."
   ;; (message "[tomelr--print-string DBG] string = `%s'" string)
   (let ((special-chars '((?b . ?\b)     ;U+0008
                          (?f . ?\f)     ;U+000C
@@ -227,7 +229,7 @@ Signal `tomelr-key-format' if it cannot be encoded as a string."
 
 ;;;; Objects
 (defun tomelr--print-pair (key val)
-  "Insert TOML representation of KEY-VAL pair at point."
+  "Insert TOML representation of KEY - VAL pair at point."
   (let ((type (cond
                ;; TODO: Need to find a robust way of detecting TOML tables.
                ((and (mapp val)
@@ -250,7 +252,7 @@ Signal `tomelr-key-format' if it cannot be encoded as a string."
       (tomelr--print val))))
 
 (defun tomelr--print-map (map)
-  "Insert TOML object representation of MAP at point.
+  "Insert a TOML representation of MAP at point.
 This works for any MAP satisfying `mapp'."
   ;; (message "[tomelr--print-map DBG] map = %S" map)
   (unless (map-empty-p map)
@@ -258,9 +260,12 @@ This works for any MAP satisfying `mapp'."
       (map-do #'tomelr--print-pair map))))
 
 (defun tomelr--print-unordered-map (map)
-  "Like `tomelr--print-map', but optionally sort MAP first.
+  "Insert a TOML representation of MAP at point, but optionally sort MAP first.
+
 If `tomelr-encoding-object-sort-predicate' is non-nil, this first
-transforms an unsortable MAP into a sortable alist."
+transforms an unsortable MAP into a sortable alist.
+
+See `tomelr-encode-plist' that returns the same as a string."
   (if (and tomelr-encoding-object-sort-predicate
            (not (map-empty-p map)))
       (tomelr--print-alist (map-pairs map) t)
@@ -269,8 +274,11 @@ transforms an unsortable MAP into a sortable alist."
 ;;;; Lists (including alists and plists)
 (defun tomelr--print-alist (alist &optional destructive)
   "Insert a TOML representation of ALIST at point.
+
 Sort ALIST first if `tomelr-encoding-object-sort-predicate' is
-non-nil.  Sorting can optionally be DESTRUCTIVE for speed."
+non-nil.  Sorting can optionally be DESTRUCTIVE for speed.
+
+See `tomelr-encode-alist' that returns the same as a string."
   (tomelr--print-map (if (and tomelr-encoding-object-sort-predicate alist)
                          (sort (if destructive alist (copy-sequence alist))
                                (lambda (a b)
@@ -290,7 +298,7 @@ non-nil.  Sorting can optionally be DESTRUCTIVE for speed."
 ;;
 
 (defun tomelr--print-list (list)
-  "Like `tomelr-encode-list', but insert the TOML at point."
+  "Insert a TOML representation of LIST at point."
   (cond ((tomelr-alist-p list) (tomelr--print-alist list))
         ((tomelr-plist-p list) (tomelr--print-unordered-map list))
         ((listp list)          (tomelr--print-array list))
@@ -298,7 +306,8 @@ non-nil.  Sorting can optionally be DESTRUCTIVE for speed."
 
 ;;;; Arrays
 (defun tomelr--print-array (array)
-  "Like `tomelr-encode-array', but insert the TOML at point."
+  "Insert a TOML representation of ARRAY at point.
+See `tomelr-encode-array' that returns the same as a string."
   (insert "[ ")
   (unless (= 0 (length array))
     (tomelr--with-indentation
@@ -319,7 +328,8 @@ ARRAY can also be a list."
 
 ;;;; Print wrapper
 (defun tomelr--print (object)
-  "Like `tomelr-encode', but insert or print the TOML at point."
+  "Insert a TOML representation of OBJECT at point.
+See `tomelr-encode' that returns the same as a string."
   (cond ((tomelr--print-keyword object))
         ((listp object)         (tomelr--print-list object))
         ((tomelr--print-stringlike object))
