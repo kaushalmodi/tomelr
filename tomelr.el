@@ -250,12 +250,41 @@ Signal `tomelr-key-format' if it cannot be encoded as a string."
 
 ;;;; Objects
 (defun tomelr--toml-table-p (object)
-  "Return non-nil if OBJECT can represent a TOML Table."
-  ;; TODO: Need to find a robust way of detecting TOML tables.
-  ;; (message "[tomelr--print-pair DBG] object type = %S" (type-of object))
-  (and (mapp object)
-       (consp object)         ;      object = ((KEY . VAL)) <- cons
-       (consp (car object)))) ;(car object) =  (KEY . VAL)  <- also cons
+  "Return non-nil if OBJECT can represent a TOML Table.
+
+Definition of a TOML Table (TT):
+
+- OBJECT is TT if it is of type ((KEY1 . VAL1) (KEY2 . VAL2) ..)
+- If OBJECT if of type ((SYMBOL . (WHATEVER))), it's possible that
+  OBJECT is a nested TT.  In that case, pass (WHATEVER) to
+  `tomelr--toml-table-p'."
+  (let (tablep)
+    ;; (message "[tomelr--toml-table-p DBG] object = %S, type = %S, mapp = %S, length = %d"
+    ;;          object (type-of object) (mapp object) (safe-length object))
+    (when (listp object)
+      ;; (message "[tomelr--toml-table-p DBG] first elem = %S, type = %S"
+      ;;          (car object) (type-of (car object)))
+      (setq tablep
+            (cond
+             ((seq-every-p
+               ;; Ensure that every element in the `object' is a (KEY
+               ;; . VAL) kind of cons.
+               (lambda (elem)
+                 ;; (message "  [tomelr--toml-table-p DBG] elem = %S, type = %S"
+                 ;;          elem (type-of elem))
+                 ;; (when (listp elem)
+                 ;;   (message "  [tomelr--toml-table-p DBG] sub-elem 0 = %S, type = %S"
+                 ;;            (nth 0 elem) (type-of (nth 0 elem))))
+                 (and (consp elem)
+                      (= 1 (safe-length elem))))
+               object)
+              t)
+             ((and (listp (car object))
+                   (symbolp (car (car object))))
+              (tomelr--toml-table-p (cdr (car object))))
+             (t
+              nil))))
+    tablep))
 
 (defun tomelr--print-pair (key val)
   "Insert TOML representation of KEY - VAL pair at point."
