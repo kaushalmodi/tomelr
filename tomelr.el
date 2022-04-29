@@ -144,11 +144,12 @@ Return nil if KEYWORD is not recognized as a TOML keyword."
     (and keyword (insert keyword))))
 
 ;;;; Strings
-(defun tomelr--print-string (string &optional trim-init-chars)
+(defun tomelr--print-string (string &optional type)
   "Insert a TOML representation of STRING at point.
 
-If TRIM-INIT-CHARS is positive, those many initial characters
-of the STRING are not inserted.
+Optional TYPE arg gives more information about the input STRING.
+For example, if the string is the name of a TOML key, it will be
+set to `keyword'.
 
 Return the same STRING passed as input.  See
 `tomelr-encode-string' instead if you need a function that
@@ -160,6 +161,7 @@ returns the TOML representation as a string."
         (special-chars-re (rx (in ?\" ?\\ cntrl ?\u007F))) ;cntrl is same as (?\u0000 . ?\u001F)
         begin-q end-q)
     (cond
+     ((equal type 'keyword))
      ((string-match-p tomelr--date-time-regexp string)) ;RFC 3339 formatted date-time with offset
      ;; Use multi-line string quotation if the string contains a " char
      ;; or a newline - """STRING"""
@@ -185,7 +187,6 @@ returns the TOML representation as a string."
       (setq end-q begin-q)))
     (and begin-q (insert begin-q))
     (goto-char (prog1 (point) (princ string)))
-    (and trim-init-chars (delete-char trim-init-chars))
     (while (re-search-forward special-chars-re nil :noerror)
       (let ((char (preceding-char)))
         (delete-char -1)
@@ -210,9 +211,11 @@ Return nil if OBJECT cannot be encoded as a TOML string."
   (cond ((stringp object)
          ;; (message "[tomelr--print-stringlike DBG] %S is string" object)
          (tomelr--print-string object))
-        ((keywordp object)
+        ((keywordp object) ;Symbol beginning with `:', like `:some_key'
          ;; (message "[tomelr--print-stringlike DBG] %S is keyword" object)
-         (tomelr--print-string (symbol-name object) 1))
+         (tomelr--print-string
+          (string-trim-left (symbol-name object) ":")
+          'keyword))
         ((symbolp object)
          (let ((sym-name (symbol-name object)))
            ;; (message "[tomelr--print-stringlike DBG] %S is symbol, type = %S, depth = %d"

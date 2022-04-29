@@ -960,26 +960,29 @@ contributors = [
                   :key2 "klm")])
 #+end_src
 **** TOML
+#+begin_src emacs-lisp :noweb yes :exports results :wrap src toml
+(tomelr-encode
+  <<p-list>>)
+#+end_src
+
+#+RESULTS:
 #+begin_src toml
-int = 123.0
+int = 123
 str = "abc"
 bool_false = false
 bool_true = true
-int_list = [1.0, 2.0, 3.0]
-str_list = ["a", "b", "c"]
-bool_list = [true, false, true, false]
-list_of_lists = [ [1.0, 2.0],
-                  [3.0, 4.0, 5.0] ]
-
+int_list = [ 1, 2, 3 ]
+str_list = [ "a", "b", "c" ]
+bool_list = [ true, false, true, false ]
+list_of_lists = [ [ 1, 2 ], [ 3, 4, 5 ] ]
 [map]
-  key1 = 123.0
-  key2 = "xyz"
-
-[[list_of_maps]]
-  key1 = 123.0
+  key1 = 123
   key2 = "xyz"
 [[list_of_maps]]
-  key1 = 567.0
+  key1 = 123
+  key2 = "xyz"
+[[list_of_maps]]
+  key1 = 567
   key2 = "klm"
 #+end_src
 **** JSON Reference
