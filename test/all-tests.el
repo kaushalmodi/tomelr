@@ -25,4 +25,5 @@
 (require 'tnil)
 (require 'tarray)
 (require 'ttable)
+(require 'ttable-array)
 (require 'tplist)

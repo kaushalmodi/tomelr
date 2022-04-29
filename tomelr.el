@@ -53,7 +53,10 @@ ordered alphabetically.")
 Dictates repetitions of `tomelr-encoding-default-indentation'.")
 
 (defvar tomelr--print-table-hierarchy ()
-  "Internal variable used to save the TOML table hierarchy.")
+  "Internal variable used to save the TOML Table hierarchy.")
+
+(defvar tomelr--print-table-array-key ""
+  "Internal variable used to save the TOML Table Array name.")
 
 (defvar tomelr--print-keyval-separator " = "
   "String used to separate key-value pairs during encoding.")
@@ -236,6 +239,10 @@ Return nil if OBJECT cannot be encoded as a TOML string."
              ;; (message "[tomelr--print-stringlike DBG] table hier: %S"
              ;;          tomelr--print-table-hierarchy)
              (princ (format "[%s]" (string-join tomelr--print-table-hierarchy "."))))
+            ((equal type 'table-array)
+             (let ((tta-name (format "[[%s]]" sym-name)))
+               (setq tomelr--print-table-array-key tta-name)
+               (princ tta-name)))
             (t
              (princ sym-name)))))))
 
@@ -290,6 +297,7 @@ Definition of a TOML Table (TT):
   "Insert TOML representation of KEY - VAL pair at point."
   (let ((type (cond
                ((tomelr--toml-table-p val) 'table)
+               ((tomelr--toml-table-array-p val) 'table-array)
                (t nil))))
     ;; (message "[tomelr--print-pair DBG] key = %S, val = %S, type = %S"
     ;;          key val type)
@@ -356,21 +364,47 @@ See `tomelr-encode-alist' that returns the same as a string."
         ((signal 'tomelr-error (list list)))))
 
 ;;;; Arrays
+(defun tomelr--toml-table-array-p (object)
+  "Return non-nil if OBJECT can represent a TOML Table Array.
+
+Definition of a TOML Table Array (TTA):
+
+- OBJECT is TTA if it is of type ((TT1) (TT2) ..) where each element is a
+  TOML Table (TT)."
+  (when (listp object)
+    (seq-every-p
+     (lambda (elem)
+       (tomelr--toml-table-p elem))
+     object)))
+
 (defun tomelr--print-array (array)
   "Insert a TOML representation of ARRAY at point.
 See `tomelr-encode-array' that returns the same as a string."
-  (insert "[ ")
-  (unless (= 0 (length array))
-    (tomelr--with-indentation
+  ;; (message "[tomelr--print-array DBG] array = %S, TTA = %S"
+  ;;          array (tomelr--toml-table-array-p array))
+  (cond
+   ((tomelr--toml-table-array-p array)
+    (unless (= 0 (length array))
       (let ((first t))
         (mapc (lambda (elt)
                 (if first
                     (setq first nil)
-                  (insert ", "))
+                  (insert (format "\n%s" tomelr--print-table-array-key)))
                 (tomelr--print elt))
-              array)))
-    (insert " "))
-  (insert "]"))
+              array))))
+   (t
+    (insert "[ ")
+    (unless (= 0 (length array))
+      (tomelr--with-indentation
+        (let ((first t))
+          (mapc (lambda (elt)
+                  (if first
+                      (setq first nil)
+                    (insert ", "))
+                  (tomelr--print elt))
+                array)))
+      (insert " "))
+    (insert "]"))))
 
 (defun tomelr-encode-array (array)
   "Return a TOML representation of ARRAY.

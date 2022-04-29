@@ -32,8 +32,8 @@ specification defined below.
 - [X] Tables
   - [X] Basic Tables
   - [X] Nested Tables
-- [ ] Array of Tables
-  - [ ] Basic Array of Tables
+- [-] Array of Tables
+  - [X] Basic Array of Tables
   - [ ] Nested Array of Tables
 - [ ] Property Lists
 * Specification and Conversion Examples
@@ -483,7 +483,8 @@ CLOSED: [2022-04-29 Fri 14:30]
 }
 #+end_example
 ** TOML Array of Tables: Lists of Maps
-*** Basic Array of Tables
+*** DONE Basic Array of Tables
+CLOSED: [2022-04-29 Fri 18:14]
 **** S-expression
 #+begin_src emacs-lisp :eval no :noweb-ref table-arrays
 '((products . (((name . "Hammer")
@@ -500,6 +501,34 @@ CLOSED: [2022-04-29 Fri 14:30]
                    (note . "A note `mono`.")))))
 #+end_src
 **** TOML
+#+begin_src emacs-lisp :noweb yes :exports results :wrap src toml
+(tomelr-encode
+  <<table-arrays>>)
+#+end_src
+
+#+RESULTS:
+#+begin_src toml
+[[products]]
+  name = "Hammer"
+  sku = 738594937
+[[products]]
+[[products]]
+  name = "Nail"
+  sku = 284758393
+  color = "gray"
+[[org_logbook]]
+  timestamp = 2022-04-08T14:53:00-04:00
+  note = """
+This note addition prompt shows up on typing the `C-c C-z` binding.
+See [org#Drawers](https://www.gnu.org/software/emacs/manual/html_mono/org.html#Drawers)."""
+[[org_logbook]]
+  timestamp = 2018-09-06T11:45:00-04:00
+  note = "Another note **bold** _italics_."
+[[org_logbook]]
+  timestamp = 2018-09-06T11:37:00-04:00
+  note = "A note `mono`."
+#+end_src
+
 #+begin_src toml
 [[products]]
   name = "Hammer"
