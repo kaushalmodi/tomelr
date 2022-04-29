@@ -24,6 +24,7 @@
 
 ;;; Code:
 
+(require 'json)
 (require 'map)
 (require 'subr-x)  ;For `string-trim' on Emacs versions 27.2 and older
 
@@ -208,43 +209,46 @@ returns the TOML representation as a string."
 (defun tomelr--print-stringlike (object &optional type)
   "Insert OBJECT encoded as a TOML string at point.
 
-TYPE is set to `table' if OBJECT is a TOML Table key.
+Possible value of TYPE are `table', `table-array' or nil.
 
 Return nil if OBJECT cannot be encoded as a TOML string."
-  (cond ((stringp object)
-         ;; (message "[tomelr--print-stringlike DBG] %S is string" object)
-         (tomelr--print-string object))
-        ((keywordp object) ;Symbol beginning with `:', like `:some_key'
-         ;; (message "[tomelr--print-stringlike DBG] %S is keyword" object)
-         (tomelr--print-string
-          (string-trim-left (symbol-name object) ":")
-          'keyword))
-        ((symbolp object)
-         (let ((sym-name (symbol-name object)))
-           ;; (message "[tomelr--print-stringlike DBG] %S is symbol, type = %S, depth = %d"
-           ;;          object type tomelr--print-indentation-depth)
-           (cond
-            ((equal type 'table)
-             (if (null (nth tomelr--print-indentation-depth tomelr--print-table-hierarchy))
-                 (progn
-                   (push sym-name tomelr--print-table-hierarchy)
-                   (setq tomelr--print-table-hierarchy (nreverse tomelr--print-table-hierarchy)))
-               ;; Throw away table keys collected at higher depths, if
-               ;; any, from earlier runs of this function.
-               (setq tomelr--print-table-hierarchy
-                     (seq-take tomelr--print-table-hierarchy
-                               (1+ tomelr--print-indentation-depth)))
-               (setf (nth tomelr--print-indentation-depth tomelr--print-table-hierarchy)
-                     sym-name))
-             ;; (message "[tomelr--print-stringlike DBG] table hier: %S"
-             ;;          tomelr--print-table-hierarchy)
-             (princ (format "[%s]" (string-join tomelr--print-table-hierarchy "."))))
-            ((equal type 'table-array)
-             (let ((tta-name (format "[[%s]]" sym-name)))
-               (setq tomelr--print-table-array-key tta-name)
-               (princ tta-name)))
-            (t
-             (princ sym-name)))))))
+  (let ((sym-name (cond ((stringp object)
+                         object)
+                        ;; Symbol beginning with `:', like `:some_key'
+                        ((keywordp object)
+                         (string-trim-left (symbol-name object) ":"))
+                        ((symbolp object)
+                         (symbol-name object)))))
+    (cond
+     ((equal type 'table)
+      ;; (message "[tomelr--print-stringlike DBG] %S is symbol, type = %S, depth = %d"
+      ;;          object type tomelr--print-indentation-depth)
+      (if (null (nth tomelr--print-indentation-depth tomelr--print-table-hierarchy))
+          (progn
+            (push sym-name tomelr--print-table-hierarchy)
+            (setq tomelr--print-table-hierarchy (nreverse tomelr--print-table-hierarchy)))
+        ;; Throw away table keys collected at higher depths, if
+        ;; any, from earlier runs of this function.
+        (setq tomelr--print-table-hierarchy
+              (seq-take tomelr--print-table-hierarchy
+                        (1+ tomelr--print-indentation-depth)))
+        (setf (nth tomelr--print-indentation-depth tomelr--print-table-hierarchy)
+              sym-name))
+      ;; (message "[tomelr--print-stringlike DBG] table hier: %S"
+      ;;          tomelr--print-table-hierarchy)
+      (princ (format "[%s]" (string-join tomelr--print-table-hierarchy "."))))
+     ((equal type 'table-array)
+      (let ((tta-name (format "[[%s]]" sym-name)))
+        (setq tomelr--print-table-array-key tta-name)
+        (princ tta-name)))
+     ((stringp object)
+      ;; (message "[tomelr--print-stringlike DBG] %S is string" object)
+      (tomelr--print-string sym-name))
+     ((keywordp object)
+      ;; (message "[tomelr--print-stringlike DBG] %S is keyword" object)
+      (tomelr--print-string sym-name 'keyword))
+     (sym-name
+      (princ sym-name)))))
 
 (defun tomelr--print-key (key &optional type)
   "Insert a TOML key representation of KEY at point.
@@ -273,6 +277,8 @@ Definition of a TOML Table (TT):
       ;;          (car object) (type-of (car object)))
       (setq tablep
             (cond
+             ((json-plist-p object)
+              t)
              ((seq-every-p
                ;; Ensure that every element in the `object' is a (KEY
                ;; . VAL) kind of cons.
