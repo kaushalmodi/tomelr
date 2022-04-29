@@ -18,7 +18,7 @@ the Emacs core library [[https://git.savannah.gnu.org/cgit/emacs.git/tree/lisp/j
 
 It will then be gradually refactored so that it meets the
 specification defined below.
-* Library Completion Status [1/7]
+* Library Completion Status [2/7]
 - [X] Scalar
   - [X] Boolean
   - [X] Integer
@@ -26,7 +26,7 @@ specification defined below.
   - [X] String
   - [X] Date
   - [X] Date + Time with Offset
-- [ ] Nil
+- [X] Nil
 - [ ] Arrays
 - [ ] Array of Arrays
 - [ ] Tables
@@ -240,6 +240,43 @@ odt3 = 1979-05-27T00:32:00.999999-07:00
 :   "odt1": "1979-05-27T07:32:00Z",
 :   "odt2": "1979-05-27T00:32:00-07:00",
 :   "odt3": "1979-05-27T00:32:00.999999-07:00"
+: }
+** DONE Nil
+CLOSED: [2022-04-29 Fri 00:11]
+**** S-expression
+#+begin_src emacs-lisp :eval no :noweb-ref nil-value
+'((key1 . 123)
+  (key2 . nil)
+  (key3 . "abc")
+  (key4 . :false)
+  (key5 . t))
+#+end_src
+**** TOML
+#+begin_src emacs-lisp :noweb yes :exports results :wrap src toml
+(tomelr-encode
+  <<nil-value>>)
+#+end_src
+
+#+RESULTS:
+#+begin_src toml
+key1 = 123
+key3 = "abc"
+key4 = false
+key5 = true
+#+end_src
+**** JSON Reference
+#+begin_src emacs-lisp :noweb yes :exports results
+(json-encode-pretty
+  <<nil-value>>)
+#+end_src
+
+#+RESULTS:
+: {
+:   "key1": 123,
+:   "key2": null,
+:   "key3": "abc",
+:   "key4": false,
+:   "key5": true
 : }
 ** TOML Arrays: Lists
 https://toml.io/en/v1.0.0#array
@@ -827,36 +864,6 @@ booleans = [true, false]
   ]
 }
 #+end_example
-** Nil
-**** S-expression
-#+begin_src emacs-lisp :eval no :noweb-ref nil-value
-'((key1 . 123)
-  (key2 . nil)
-  (key3 . "abc")
-  (key4 . :false)
-  (key5 . t))
-#+end_src
-**** TOML
-#+begin_src toml
-key1 = 123
-key3 = "abc"
-key4 = false
-key5 = true
-#+end_src
-**** JSON Reference
-#+begin_src emacs-lisp :noweb yes :exports results
-(json-encode-pretty
-  <<nil-value>>)
-#+end_src
-
-#+RESULTS:
-: {
-:   "key1": 123,
-:   "key2": null,
-:   "key3": "abc",
-:   "key4": false,
-:   "key5": true
-: }
 ** P-lists
 **** S-expression
 #+begin_src emacs-lisp :eval no :noweb-ref p-list

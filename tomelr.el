@@ -225,10 +225,12 @@ Signal `tomelr-key-format' if it cannot be encoded as a string."
 ;;;; Objects
 (defun tomelr--print-pair (key val)
   "Insert TOML representation of KEY-VAL pair at point."
-  (tomelr--print-indentation) ;Newline before each key in a key-value pair
-  (tomelr--print-key key)
-  (insert tomelr--print-keyval-separator)
-  (tomelr--print val))
+  ;; (message "[tomelr--print-pair DBG] key = %S, val = %S" key val)
+  (when val                     ;Don't print the key if val is nil
+    (tomelr--print-indentation) ;Newline before each key in a key-value pair
+    (tomelr--print-key key)
+    (insert tomelr--print-keyval-separator)
+    (tomelr--print val)))
 
 (defun tomelr--print-map (map)
   "Insert TOML object representation of MAP at point.
@@ -310,6 +312,7 @@ ARRAY can also be a list."
         ((arrayp object)        (tomelr--print-array object))
         ((hash-table-p object)  (tomelr--print-unordered-map object))
         ((signal 'tomelr-error (list object)))))
+
 
 
 ;;; User API

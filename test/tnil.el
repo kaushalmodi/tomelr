@@ -1,4 +1,4 @@
-;;; all-tests.el --- Tests for tomelr.el                   -*- lexical-binding: t; -*-
+;; -*- lexical-binding: t; -*-
 
 ;; Authors: Kaushal Modi <kaushal.modi@gmail.com>
 
@@ -17,9 +17,32 @@
 ;; You should have received a copy of the GNU General Public License
 ;; along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+;;; Commentary:
+
+;; Test removal of keys with nil value.
+
 ;;; Code:
+(require 'tomelr)
 
-(setq load-prefer-newer t)
+;;;; Key with nil value
+(ert-deftest test-nil ()
+  (let ((inp '(((nil_key . nil))
+               ((bool1 . t)
+                (int . +99)
+                (nil_key1 . nil)
+                (bool2 . :false)
+                (nil_key2 . nil)
+                (bool3 . "false"))
+               ))
+        (ref '(""
+               "bool1 = true
+int = 99
+bool2 = false
+bool3 = false"))
+        out)
+    (dolist (el inp)
+      (push (tomelr-encode el) out))
+    (should (equal ref (nreverse out)))))
 
-(require 'tscalar)
-(require 'tnil)
+
+(provide 'tnil)
