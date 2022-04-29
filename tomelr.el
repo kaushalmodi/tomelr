@@ -277,7 +277,7 @@ non-nil.  Sorting can optionally be DESTRUCTIVE for speed."
 (defun tomelr--print-array (array)
   "Like `tomelr-encode-array', but insert the TOML at point."
   (insert "[ ")
-  (unless (length= array 0)
+  (unless (= 0 (length array))
     (tomelr--with-indentation
       (let ((first t))
         (mapc (lambda (elt)
@@ -285,8 +285,9 @@ non-nil.  Sorting can optionally be DESTRUCTIVE for speed."
                     (setq first nil)
                   (insert ", "))
                 (tomelr--print elt))
-              array))))
-  (insert " ]"))
+              array)))
+    (insert " "))
+  (insert "]"))
 
 (defun tomelr-encode-array (array)
   "Return a TOML representation of ARRAY.
