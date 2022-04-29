@@ -377,7 +377,7 @@ Definition of a TOML Table Array (TTA):
 
 - OBJECT is TTA if it is of type ((TT1) (TT2) ..) where each element is a
   TOML Table (TT)."
-  (when (listp object)
+  (when (mapp object)
     (seq-every-p
      (lambda (elem)
        (tomelr--toml-table-p elem))

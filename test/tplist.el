@@ -40,13 +40,10 @@
                   :list_of_lists [(1 2) (3 4 5)]
                   :map (:key1 123
                         :key2 "xyz")
-                  ;; TODO plist specification of TOML tables arrays is
-                  ;; not yet supported.
-                  ;; :list_of_maps [(:key1 123
-                  ;;                 :key2 "xyz")
-                  ;;                (:key1 567
-                  ;;                 :key2 "klm")]
-                  )))
+                  :list_of_maps [(:key1 123
+                                  :key2 "xyz")
+                                 (:key1 567
+                                  :key2 "klm")])))
           (ref '("int = 123
 str = \"abc\"
 bool_false = false
@@ -57,7 +54,13 @@ bool_list = [ true, false, true, false ]
 list_of_lists = [ [ 1, 2 ], [ 3, 4, 5 ] ]
 [map]
   key1 = 123
-  key2 = \"xyz\""))
+  key2 = \"xyz\"
+[[list_of_maps]]
+  key1 = 123
+  key2 = \"xyz\"
+[[list_of_maps]]
+  key1 = 567
+  key2 = \"klm\""))
           out)
       (dolist (el inp)
         (push (tomelr-encode el) out))
