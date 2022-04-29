@@ -393,6 +393,7 @@ nested_mixed_array = [ [ 1, 2 ], [ "a", "b", "c" ] ]
 }
 #+end_example
 ** TOML Tables: Maps or Dictionaries or Hash Tables
+https://toml.io/en/v1.0.0#table
 *** DONE Basic TOML Tables
 CLOSED: [2022-04-29 Fri 13:41]
 **** S-expression
@@ -483,6 +484,7 @@ CLOSED: [2022-04-29 Fri 14:30]
 }
 #+end_example
 ** TOML Array of Tables: Lists of Maps
+https://toml.io/en/v1.0.0#array-of-tables
 *** DONE Basic Array of Tables
 CLOSED: [2022-04-29 Fri 18:14]
 **** S-expression
