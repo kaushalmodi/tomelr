@@ -196,40 +196,63 @@ Return the same STRING passed as input."
   "Return a TOML representation of STRING."
   (tomelr--with-output-to-string (tomelr--print-string string)))
 
-(defun tomelr--print-stringlike (object)
+(defun tomelr--print-stringlike (object &optional type)
   "Insert OBJECT encoded as a TOML string at point.
+
+TYPE is set to `table' if OBJECT is a TOML Table key.
+
 Return nil if OBJECT cannot be encoded as a TOML string."
   (cond ((stringp object)
-         ;; (message "[tomelr--print-stringlike DBG] string")
+         ;; (message "[tomelr--print-stringlike DBG] %S is string" object)
          (tomelr--print-string object))
         ((keywordp object)
-         ;; (message "[tomelr--print-stringlike DBG] keyword")
+         ;; (message "[tomelr--print-stringlike DBG] %S is keyword" object)
          (tomelr--print-string (symbol-name object) 1))
         ((symbolp object)
-         ;; (message "[tomelr--print-stringlike DBG] symbol")
-         (princ (symbol-name object))
-         ;; (tomelr--print-string (symbol-name object))
-         )))
+         ;; (message "[tomelr--print-stringlike DBG] %S is symbol" object)
+         (cond
+          ((equal type 'table)
+           (princ (format "[%s]" (symbol-name object))))
+          (t
+           (princ (symbol-name object)))))))
 
-(defun tomelr--print-key (object)
-  "Insert a TOML key representation of OBJECT at point.
+(defun tomelr--print-key (key &optional type)
+  "Insert a TOML key representation of KEY at point.
+
+TYPE is set to `table' if KEY is a TOML Table key.
+
 Signal `tomelr-key-format' if it cannot be encoded as a string."
-  (or (tomelr--print-stringlike object)
-      (signal 'tomelr-key-format (list object))))
+  (or (tomelr--print-stringlike key type)
+      (signal 'tomelr-key-format (list key))))
 
 ;;;; Objects
 (defun tomelr--print-pair (key val)
   "Insert TOML representation of KEY-VAL pair at point."
-  ;; (message "[tomelr--print-pair DBG] key = %S, val = %S" key val)
-  (when val                     ;Don't print the key if val is nil
-    (tomelr--print-indentation) ;Newline before each key in a key-value pair
-    (tomelr--print-key key)
-    (insert tomelr--print-keyval-separator)
-    (tomelr--print val)))
+  (let ((type (cond
+               ;; TODO: Need to find a robust way of detecting TOML tables.
+               ((and (mapp val)
+                     (consp val)       ;      val = ((KEY . VAL)) <- cons
+                     (consp (car val)) ;(car val) = (KEY . VAL)   <- also cons
+                     )
+                'table)
+               (t
+                nil))))
+    ;; (message "[tomelr--print-pair DBG] key = %S, val = %S, type = %S"
+    ;;          key val type)
+    ;; (message "[tomelr--print-pair DBG] val type = %S" (type-of val))
+    (when val                     ;Don't print the key if val is nil
+      (tomelr--print-indentation) ;Newline before each key in a key-value pair
+      (tomelr--print-key key type)
+      ;; Skip putting the separator if `type' has a non-nil value like
+      ;; `table'.
+      (unless type
+        (insert tomelr--print-keyval-separator))
+      (tomelr--print val))))
 
 (defun tomelr--print-map (map)
   "Insert TOML object representation of MAP at point.
 This works for any MAP satisfying `mapp'."
+  ;; (message "[tomelr--print-map DBG] map = %S" map)
   (unless (map-empty-p map)
     (tomelr--with-indentation
       (map-do #'tomelr--print-pair map))))

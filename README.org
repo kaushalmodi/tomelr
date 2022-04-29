@@ -29,8 +29,8 @@ specification defined below.
 - [X] Nil
 - [X] Arrays
 - [X] Array of Arrays
-- [ ] Tables
-  - [ ] Basic Tables
+- [-] Tables
+  - [X] Basic Tables
   - [ ] Nested Tables
 - [ ] Array of Tables
   - [ ] Basic Array of Tables
@@ -393,7 +393,8 @@ nested_mixed_array = [ [ 1, 2 ], [ "a", "b", "c" ] ]
 }
 #+end_example
 ** TOML Tables: Maps or Dictionaries or Hash Tables
-*** Basic TOML Tables
+*** DONE Basic TOML Tables
+CLOSED: [2022-04-29 Fri 13:41]
 **** S-expression
 #+begin_src emacs-lisp :eval no :noweb-ref tables
 '((table-1 . ((key1 . "some string")
@@ -402,11 +403,16 @@ nested_mixed_array = [ [ 1, 2 ], [ "a", "b", "c" ] ]
               (key2 . 456))))
 #+end_src
 **** TOML
+#+begin_src emacs-lisp :noweb yes :exports results :wrap src toml
+(tomelr-encode
+  <<tables>>)
+#+end_src
+
+#+RESULTS:
 #+begin_src toml
 [table-1]
   key1 = "some string"
   key2 = 123
-
 [table-2]
   key1 = "another string"
   key2 = 456

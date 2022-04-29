@@ -1,4 +1,4 @@
-;;; all-tests.el --- Tests for tomelr.el                   -*- lexical-binding: t; -*-
+;; -*- lexical-binding: t; -*-
 
 ;; Authors: Kaushal Modi <kaushal.modi@gmail.com>
 
@@ -17,11 +17,29 @@
 ;; You should have received a copy of the GNU General Public License
 ;; along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+;;; Commentary:
+
+;; Test conversion to TOML tables.
+
 ;;; Code:
+(require 'tomelr)
 
-(setq load-prefer-newer t)
+;;;; Simple tables
+(ert-deftest test-table ()
+  (let ((inp '(((table-1 . ((key1 . "some string")
+                            (key2 . 123))))
+               ((table-2 . ((key1 . "another string")
+                            (key2 . 456))))))
+        (ref '("[table-1]
+  key1 = \"some string\"
+  key2 = 123"
+               "[table-2]
+  key1 = \"another string\"
+  key2 = 456"))
+        out)
+    (dolist (el inp)
+      (push (tomelr-encode el) out))
+    (should (equal ref (nreverse out)))))
 
-(require 'tscalar)
-(require 'tnil)
-(require 'tarray)
-(require 'ttable)
+
+(provide 'ttable)
