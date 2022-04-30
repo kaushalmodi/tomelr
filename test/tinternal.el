@@ -66,6 +66,9 @@
                ;; TTA with 1 table nesting another TTA
                (((a . (((b . 2))))))
                ((:a ((:b 2))))
+               ;; TTA with vector notation
+               [(:a 100 :b "foo")
+                (:a 200 :b "bar")]
                )))
     (dolist (el inp)
       (should (equal t (tomelr--toml-table-array-p el))))))

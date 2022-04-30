@@ -393,7 +393,8 @@ Definition of a TOML Table Array (TTA):
   TOML Table (TT)."
   (let (ttap)
     (when (and (not (tomelr--toml-table-p object))
-               (listp object))
+               (or (listp object)
+                   (vectorp object)))
       ;; (message "[tomelr--toml-table-array-p DBG] object = %S, type = %S, len = %d"
       ;;          object (type-of object) (safe-length object))
       (setq ttap (cond
@@ -404,18 +405,21 @@ Definition of a TOML Table Array (TTA):
                       ;; (when (listp elem)
                       ;;   (message "  [tomelr--toml-table-array-p DBG] sub-elem 0 = %S, type = %S, len = %d"
                       ;;            (car elem) (type-of (car elem)) (safe-length (car elem))))
-                      (tomelr--toml-table-p elem))
+                      (or
+                       (tomelr--toml-table-p elem)
+                       ;; Handling the case of a nested TTA.
+                       ;; Example:                        (((a . (((b . 2))))))
+                       (and (listp elem)                 ; ((a . (((b . 2)))))
+                            (listp (car elem))           ;  (a . (((b . 2))))
+                            (symbolp (car (car elem)))   ;   a  <- symbol
+                            ;;                           --(((b . 2)))-  <-- This will be a TTA.
+                            (tomelr--toml-table-array-p (cdr (car elem))))))
                     object)
                    t)
-                  ;; Handling the case of a nested TTA.
-                  ;; Example:                                 (((a . (((b . 2))))))
-                  ((and (listp (car object))                 ; ((a . (((b . 2)))))
-                        (listp (car (car object)))           ;  (a . (((b . 2))))
-                        (symbolp (car (car (car object)))))  ;   a  <- symbol
-                   ;;                           ------(((b . 2)))-----  <-- This will be a TTA.
-                   (tomelr--toml-table-array-p (cdr (car (car object)))))
                   (t
                    nil))))
+    ;; (message "[tomelr--toml-table-array-p DBG] ttap = %S" ttap)
+    ;; (message "=====")
     ttap))
 
 (defun tomelr--print-tta-key ()
