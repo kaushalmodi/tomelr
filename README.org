@@ -573,12 +573,17 @@ See [org#Drawers](https://www.gnu.org/software/emacs/manual/html_mono/org.html#D
 '((fruits . (((name . "apple")
               (physical . ((color . "red")
                            (shape . "round")))
-              (varieties . ((((name . "red delicious"))
-                             ((name . "granny smith"))))))
+              (varieties . (((name . "red delicious"))
+                            ((name . "granny smith")))))
              ((name . "banana")
               (varieties . (((name . "plantain"))))))))
 #+end_src
 **** TOML
+#+begin_src emacs-lisp :noweb yes :exports results :wrap src toml
+(tomelr-encode
+  <<nested-table-arrays>>)
+#+end_src
+
 #+begin_src toml
 [[fruits]]
   name = "apple"
@@ -611,14 +616,12 @@ See [org#Drawers](https://www.gnu.org/software/emacs/manual/html_mono/org.html#D
         "shape": "round"
       },
       "varieties": [
-        [
-          {
-            "name": "red delicious"
-          },
-          {
-            "name": "granny smith"
-          }
-        ]
+        {
+          "name": "red delicious"
+        },
+        {
+          "name": "granny smith"
+        }
       ]
     },
     {
