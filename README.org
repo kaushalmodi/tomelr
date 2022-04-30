@@ -18,7 +18,7 @@ the Emacs core library [[https://git.savannah.gnu.org/cgit/emacs.git/tree/lisp/j
 
 It will then be gradually refactored so that it meets the
 specification defined below.
-* Library Completion Status [6/7]
+* Library Completion Status [5/7]
 - [X] Scalar
   - [X] Boolean
   - [X] Integer
@@ -35,7 +35,7 @@ specification defined below.
 - [-] Array of Tables
   - [X] Basic Array of Tables
   - [ ] Nested Array of Tables
-- [X] Property Lists
+- [ ] Property Lists
 * Specification and Conversion Examples
 [[https://scripter.co/defining-tomelr/][Companion blog post]]
 
@@ -952,8 +952,7 @@ contributors = [
   ]
 }
 #+end_example
-** DONE P-lists
-CLOSED: [2022-04-29 Fri 18:42]
+** TODO P-lists
 **** S-expression
 #+begin_src emacs-lisp :eval no :noweb-ref p-list
 '(:int 123

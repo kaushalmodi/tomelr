@@ -47,7 +47,17 @@
 ;;;; tomelr--toml-table-array-p
 (ert-deftest test-internal-valid-tta ()
   (let ((inp '(
+               ;; ;; TTA with 1 table of 1 key-val pair
                (((a . 1)))
+               ((:a  1))
+               ;; ;; TTA with 2 tables of 2 key-val pairs
+               (((a . 1) (b . 2))
+                ((a . 100) (b . 200)))
+               ((:a 1 :b 2)
+                (:a 100 :b 200))
+               ;; TTA with 1 table nesting another TTA
+               (((a . (((b . 2))))))
+               ((:a ((:b 2))))
                )))
     (dolist (el inp)
       (should (equal t (tomelr--toml-table-array-p el))))))

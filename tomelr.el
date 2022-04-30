@@ -378,13 +378,32 @@ Definition of a TOML Table Array (TTA):
 
 - OBJECT is TTA if it is of type ((TT1) (TT2) ..) where each element is a
   TOML Table (TT)."
-  (when (and (not (tomelr--toml-table-p object))
-             (not (stringp object))
-             (mapp object)) ;Because `mapp' is non-nil for strings too
-    (seq-every-p
-     (lambda (elem)
-       (tomelr--toml-table-p elem))
-     object)))
+  (let (ttap)
+    (when (and (not (tomelr--toml-table-p object))
+               (listp object))
+      ;; (message "[tomelr--toml-table-array-p DBG] object = %S, type = %S, len = %d"
+      ;;          object (type-of object) (safe-length object))
+      (setq ttap (cond
+                  ((seq-every-p
+                    (lambda (elem)
+                      ;; (message "  [tomelr--toml-table-array-p DBG] elem = %S, type = %S, len = %d"
+                      ;;          elem (type-of elem) (safe-length elem))
+                      ;; (when (listp elem)
+                      ;;   (message "  [tomelr--toml-table-array-p DBG] sub-elem 0 = %S, type = %S, len = %d"
+                      ;;            (car elem) (type-of (car elem)) (safe-length (car elem))))
+                      (tomelr--toml-table-p elem))
+                    object)
+                   t)
+                  ;; Handling the case of a nested TTA.
+                  ;; Example:                                 (((a . (((b . 2))))))
+                  ((and (listp (car object))                 ; ((a . (((b . 2)))))
+                        (listp (car (car object)))           ;  (a . (((b . 2))))
+                        (symbolp (car (car (car object)))))  ;   a  <- symbol
+                   ;;                           ------(((b . 2)))-----  <-- This will be a TTA.
+                   (tomelr--toml-table-array-p (cdr (car (car object)))))
+                  (t
+                   nil))))
+    ttap))
 
 (defun tomelr--print-array (array)
   "Insert a TOML representation of ARRAY at point.
