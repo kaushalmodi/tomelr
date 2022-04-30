@@ -62,6 +62,22 @@ See [org#Drawers](https://www.gnu.org/software/emacs/manual/html_mono/org.html#D
       (push (tomelr-encode el) out))
     (should (equal ref (nreverse out)))))
 
+;;;; Sub-table in a TOML Table Array
+(ert-deftest test-subtable-in-tta ()
+  (let ((inp '(
+               ((fruits . (((name . "apple")
+                            (physical . ((color . "red")
+                                         (shape . "round")))))))))
+        (ref '("[[fruits]]
+  name = \"apple\"
+  [fruits.physical]
+    color = \"red\"
+    shape = \"round\""))
+        out)
+    (dolist (el inp)
+      (push (tomelr-encode el) out))
+    (should (equal ref (nreverse out)))))
+
 ;;;; Nested array of tables
 (ert-deftest test-nested-array-of-tables ()
   (let ((inp '(
