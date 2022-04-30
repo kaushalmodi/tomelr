@@ -14,9 +14,59 @@ Clone this repo, have ~tomelr.el~ in the ~load-path~ and ~(require
 This library started off by extracting the JSON Encoding pieces from
 the Emacs core library [[https://git.savannah.gnu.org/cgit/emacs.git/tree/lisp/json.el][*json.el*]].
 
-It will then be gradually refactored so that it meets the
-specification defined below.
-* Library Completion Status [7/7]
+It was then refactored to meet the specification defined below.
+* Limitation
+Right now, the scalars and tables/array of tables does not get ordered
+in the right order automatically. So the user needs to ensure that the
+S-exp has all the scalars in the very beginning and then followed by
+TOML tables and arrays of tables.
+** Correct Example
+​:white_check_mark: Put the scalars first and then maps or tables.
+#+begin_src emacs-lisp :eval no :noweb-ref scalar-tables-order-correct
+'((title . "Hello")           ;First the scalar
+  (img . ((file . "foo.png")  ;Then the map or table
+          (credit . "Bar Zoo"))))
+#+end_src
+#+begin_src emacs-lisp :noweb yes :exports results :wrap src toml
+(tomelr-encode
+  <<scalar-tables-order-correct>>)
+#+end_src
+
+#+RESULTS:
+#+begin_src toml
+title = "Hello"
+[img]
+  file = "foo.png"
+  credit = "Bar Zoo"
+#+end_src
+** Wrong Example
+​:x: *Don't do this!*: Map or table first and then scalar.
+#+begin_src emacs-lisp :eval no :noweb-ref scalar-tables-order-wrong
+'((img . ((file . "foo.png")
+          (credit . "Bar Zoo")))
+  (title . "Hello"))
+#+end_src
+
+*Incorrect order!* Now the ~title~ became part of the ~[img]~ table!
+
+#+begin_src emacs-lisp :noweb yes :exports results :wrap src toml
+(tomelr-encode
+  <<scalar-tables-order-wrong>>)
+#+end_src
+
+#+RESULTS:
+#+begin_src toml
+[img]
+  file = "foo.png"
+  credit = "Bar Zoo"
+title = "Hello"
+#+end_src
+* Specification and Conversion Examples
+[[https://scripter.co/defining-tomelr/][Companion blog post]]
+
+Below examples are shown on how S-expressions get translated to
+various TOML object types.
+** Library Completion Status [7/7]
 - [X] Scalar
   - [X] Boolean
   - [X] Integer
@@ -34,11 +84,6 @@ specification defined below.
   - [X] Basic Array of Tables
   - [X] Nested Array of Tables
 - [X] Property Lists
-* Specification and Conversion Examples
-[[https://scripter.co/defining-tomelr/][Companion blog post]]
-
-Below examples are shown on how S-expressions get translated to
-various TOML object types.
 ** Scalars
 *** DONE Boolean
 CLOSED: [2022-04-28 Thu 16:48]
