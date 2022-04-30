@@ -62,5 +62,42 @@ See [org#Drawers](https://www.gnu.org/software/emacs/manual/html_mono/org.html#D
       (push (tomelr-encode el) out))
     (should (equal ref (nreverse out)))))
 
+;;;; Nested array of tables
+(ert-deftest test-nested-array-of-tables ()
+  (let ((inp '(
+               ((fruits . (((varieties . (((name . "red delicious"))
+                                          ((name . "granny smith"))))))))
+               ;; ((fruits . (((name . "apple")
+               ;;              (physical . ((color . "red")
+               ;;                           (shape . "round")))
+               ;;              (varieties . (((name . "red delicious"))
+               ;;                            ((name . "granny smith")))))
+               ;;             ((name . "banana")
+               ;;              (varieties . (((name . "plantain"))))))))
+               ))
+        (ref '("[[fruits]]
+  [[fruits.varieties]]
+    name = \"red delicious\"
+  [[fruits.varieties]]
+    name = \"granny smith\""
+               ;; "[[fruits]]
+               ;; name = \"apple\"
+               ;; [fruits.physical]
+               ;; color = \"red\"
+               ;; shape = \"round\"
+               ;; [[fruits.varieties]]
+               ;; name = \"red delicious\"
+               ;; [[fruits.varieties]]
+               ;; name = \"granny smith\"
+               ;; [[fruits]]
+               ;; name = \"banana\"
+               ;; [[fruits.varieties]]
+               ;; name = \"plantain\""
+               ))
+        out)
+    (dolist (el inp)
+      (push (tomelr-encode el) out))
+    (should (equal ref (nreverse out)))))
+
 
 (provide 'ttable-array)

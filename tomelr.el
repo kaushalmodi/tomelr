@@ -54,7 +54,9 @@ ordered alphabetically.")
 Dictates repetitions of `tomelr-encoding-default-indentation'.")
 
 (defvar tomelr--print-table-hierarchy ()
-  "Internal variable used to save the TOML Table hierarchy.")
+  "Internal variable used to save TOML Table hierarchies.
+This variable is used for both TOML Tables and Arrays of TOML
+Tables.")
 
 (defvar tomelr--print-table-array-key ""
   "Internal variable used to save the TOML Table Array name.")
@@ -219,8 +221,7 @@ Return nil if OBJECT cannot be encoded as a TOML string."
                          (string-trim-left (symbol-name object) ":"))
                         ((symbolp object)
                          (symbol-name object)))))
-    (cond
-     ((equal type 'table)
+    (when type
       ;; (message "[tomelr--print-stringlike DBG] %S is symbol, type = %S, depth = %d"
       ;;          object type tomelr--print-indentation-depth)
       (if (null (nth tomelr--print-indentation-depth tomelr--print-table-hierarchy))
@@ -236,9 +237,12 @@ Return nil if OBJECT cannot be encoded as a TOML string."
               sym-name))
       ;; (message "[tomelr--print-stringlike DBG] table hier: %S"
       ;;          tomelr--print-table-hierarchy)
+      )
+    (cond
+     ((equal type 'table)
       (princ (format "[%s]" (string-join tomelr--print-table-hierarchy "."))))
      ((equal type 'table-array)
-      (let ((tta-name (format "[[%s]]" sym-name)))
+      (let ((tta-name (format "[[%s]]" (string-join tomelr--print-table-hierarchy "."))))
         (setq tomelr--print-table-array-key tta-name)
         (princ tta-name)))
      ((stringp object)
@@ -417,7 +421,8 @@ See `tomelr-encode-array' that returns the same as a string."
         (mapc (lambda (elt)
                 (if first
                     (setq first nil)
-                  (insert (format "\n%s" tomelr--print-table-array-key)))
+                  (tomelr--print-indentation)
+                  (insert tomelr--print-table-array-key))
                 (tomelr--print elt))
               array))))
    (t
