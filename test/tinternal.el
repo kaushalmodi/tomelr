@@ -1,4 +1,4 @@
-;;; all-tests.el --- Tests for tomelr.el                   -*- lexical-binding: t; -*-
+;; -*- lexical-binding: t; -*-
 
 ;; Authors: Kaushal Modi <kaushal.modi@gmail.com>
 
@@ -17,15 +17,31 @@
 ;; You should have received a copy of the GNU General Public License
 ;; along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+;;; Commentary:
+
+;; Tests for some internal functions.
+
 ;;; Code:
+(require 'tomelr)
 
-(setq load-prefer-newer t)
+;;;; tomelr--toml-table-p
+(ert-deftest test-internal-valid-toml-tables ()
+  (let ((inp '(
+               ((a . 1))
+               (:a 1)
+               ((a . 1) (b . 2))
+               (:a 1 :b 2)
+               )))
+    (dolist (el inp)
+      (should (equal t (tomelr--toml-table-p el))))))
 
-(require 'tinternal)
+(ert-deftest test-internal-invalid-toml-tables ()
+  (let ((inp '(
+               (a 1)
+               ;; (((a . 1)))             ;This is an array of TOML table
+               )))
+    (dolist (el inp)
+      (should (equal nil (tomelr--toml-table-p el))))))
 
-(require 'tscalar)
-(require 'tnil)
-(require 'tarray)
-(require 'ttable)
-(require 'ttable-array)
-(require 'tplist)
+
+(provide 'tinternal)
