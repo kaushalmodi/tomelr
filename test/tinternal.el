@@ -44,5 +44,20 @@
     (dolist (el inp)
       (should (equal nil (tomelr--toml-table-p el))))))
 
+;;;; tomelr--toml-table-array-p
+(ert-deftest test-internal-valid-tta ()
+  (let ((inp '(
+               (((a . 1)))
+               )))
+    (dolist (el inp)
+      (should (equal t (tomelr--toml-table-array-p el))))))
+
+(ert-deftest test-internal-invalid-tta ()
+  (let ((inp '(
+               ((a . 1))               ;This is a TOML table
+               )))
+    (dolist (el inp)
+      (should (equal nil (tomelr--toml-table-array-p el))))))
+
 
 (provide 'tinternal)
