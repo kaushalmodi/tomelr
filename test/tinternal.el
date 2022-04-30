@@ -38,7 +38,8 @@
 (ert-deftest test-internal-invalid-toml-tables ()
   (let ((inp '(
                (a 1)
-               ;; (((a . 1)))             ;This is an array of TOML table
+               ((:a 1))                ;This is an array of TOML table
+               (((a . 1)))             ;This is an array of TOML table
                )))
     (dolist (el inp)
       (should (equal nil (tomelr--toml-table-p el))))))

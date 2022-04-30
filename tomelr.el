@@ -270,11 +270,11 @@ Definition of a TOML Table (TT):
   OBJECT is a nested TT.  In that case, pass (WHATEVER) to
   `tomelr--toml-table-p'."
   (let (tablep)
-    ;; (message "[tomelr--toml-table-p DBG] object = %S, type = %S, mapp = %S, length = %d"
-    ;;          object (type-of object) (mapp object) (safe-length object))
+    ;; (message "[tomelr--toml-table-p DBG] object = %S, type = %S, len = %d"
+    ;;          object (type-of object) (safe-length object))
     (when (listp object)
-      ;; (message "[tomelr--toml-table-p DBG] first elem = %S, type = %S"
-      ;;          (car object) (type-of (car object)))
+      ;; (message "[tomelr--toml-table-p DBG] first elem = %S, type = %S, len = %d"
+      ;;          (car object) (type-of (car object)) (safe-length (car object)))
       (setq tablep
             (cond
              ((json-plist-p object)
@@ -283,13 +283,14 @@ Definition of a TOML Table (TT):
                ;; Ensure that every element in the `object' is a (KEY
                ;; . VAL) kind of cons.
                (lambda (elem)
-                 ;; (message "  [tomelr--toml-table-p DBG] elem = %S, type = %S"
-                 ;;          elem (type-of elem))
+                 ;; (message "  [tomelr--toml-table-p DBG] elem = %S, type = %S, len = %d"
+                 ;;          elem (type-of elem) (safe-length elem))
                  ;; (when (listp elem)
-                 ;;   (message "  [tomelr--toml-table-p DBG] sub-elem 0 = %S, type = %S"
-                 ;;            (nth 0 elem) (type-of (nth 0 elem))))
+                 ;;   (message "  [tomelr--toml-table-p DBG] sub-elem 0 = %S, type = %S, len = %d"
+                 ;;            (car elem) (type-of (car elem)) (safe-length (car elem))))
                  (and (consp elem)
-                      (= 1 (safe-length elem))))
+                      (= 1 (safe-length elem))
+                      (not (consp (car elem)))))
                object)
               t)
              ((and (listp (car object))
