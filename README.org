@@ -18,7 +18,7 @@ the Emacs core library [[https://git.savannah.gnu.org/cgit/emacs.git/tree/lisp/j
 
 It will then be gradually refactored so that it meets the
 specification defined below.
-* Library Completion Status [5/7]
+* Library Completion Status [6/7]
 - [X] Scalar
   - [X] Boolean
   - [X] Integer
@@ -32,9 +32,9 @@ specification defined below.
 - [X] Tables
   - [X] Basic Tables
   - [X] Nested Tables
-- [-] Array of Tables
+- [X] Array of Tables
   - [X] Basic Array of Tables
-  - [ ] Nested Array of Tables
+  - [X] Nested Array of Tables
 - [ ] Property Lists
 * Specification and Conversion Examples
 [[https://scripter.co/defining-tomelr/][Companion blog post]]
@@ -567,7 +567,8 @@ See [org#Drawers](https://www.gnu.org/software/emacs/manual/html_mono/org.html#D
   ]
 }
 #+end_example
-*** Nested Array of Tables
+*** DONE Nested Array of Tables
+CLOSED: [2022-04-30 Sat 01:32]
 **** S-expression
 #+begin_src emacs-lisp :eval no :noweb-ref nested-table-arrays
 '((fruits . (((name . "apple")
@@ -584,13 +585,14 @@ See [org#Drawers](https://www.gnu.org/software/emacs/manual/html_mono/org.html#D
   <<nested-table-arrays>>)
 #+end_src
 
+#+RESULTS:
 #+begin_src toml
 [[fruits]]
   name = "apple"
-  [fruits.physical]  # subtable
+  [fruits.physical]
     color = "red"
     shape = "round"
-  [[fruits.varieties]]  # nested array of tables
+  [[fruits.varieties]]
     name = "red delicious"
   [[fruits.varieties]]
     name = "granny smith"

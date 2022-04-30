@@ -58,9 +58,6 @@ Dictates repetitions of `tomelr-encoding-default-indentation'.")
 This variable is used for both TOML Tables and Arrays of TOML
 Tables.")
 
-(defvar tomelr--print-table-array-key ""
-  "Internal variable used to save the TOML Table Array name.")
-
 (defvar tomelr--print-keyval-separator " = "
   "String used to separate key-value pairs during encoding.")
 
@@ -242,9 +239,7 @@ Return nil if OBJECT cannot be encoded as a TOML string."
      ((equal type 'table)
       (princ (format "[%s]" (string-join tomelr--print-table-hierarchy "."))))
      ((equal type 'table-array)
-      (let ((tta-name (format "[[%s]]" (string-join tomelr--print-table-hierarchy "."))))
-        (setq tomelr--print-table-array-key tta-name)
-        (princ tta-name)))
+      (princ (format "[[%s]]" (string-join tomelr--print-table-hierarchy "."))))
      ((stringp object)
       ;; (message "[tomelr--print-stringlike DBG] %S is string" object)
       (tomelr--print-string sym-name))
@@ -423,6 +418,19 @@ Definition of a TOML Table Array (TTA):
                    nil))))
     ttap))
 
+(defun tomelr--print-tta-key ()
+  "Print TOML Table Array key."
+  ;; (message "[tomelr--print-array DBG] depth = %d" tomelr--print-indentation-depth)
+  ;; Throw away table keys collected at higher depths, if
+  ;; any, from earlier runs of this function.
+  (setq tomelr--print-table-hierarchy
+        (seq-take tomelr--print-table-hierarchy
+                  (1+ tomelr--print-indentation-depth)))
+
+  (tomelr--print-indentation)
+  (insert
+   (format "[[%s]]" (string-join tomelr--print-table-hierarchy "."))))
+
 (defun tomelr--print-array (array)
   "Insert a TOML representation of ARRAY at point.
 See `tomelr-encode-array' that returns the same as a string."
@@ -435,8 +443,7 @@ See `tomelr-encode-array' that returns the same as a string."
         (mapc (lambda (elt)
                 (if first
                     (setq first nil)
-                  (tomelr--print-indentation)
-                  (insert tomelr--print-table-array-key))
+                  (tomelr--print-tta-key))
                 (tomelr--print elt))
               array))))
    (t

@@ -86,13 +86,13 @@ See [org#Drawers](https://www.gnu.org/software/emacs/manual/html_mono/org.html#D
                ((fruits . (((name . "apple")
                             (varieties . (((name . "red delicious"))
                                           ((name . "granny smith"))))))))
-               ;; ((fruits . (((name . "apple")
-               ;;              (physical . ((color . "red")
-               ;;                           (shape . "round")))
-               ;;              (varieties . (((name . "red delicious"))
-               ;;                            ((name . "granny smith")))))
-               ;;             ((name . "banana")
-               ;;              (varieties . (((name . "plantain"))))))))
+               ((fruits . (((name . "apple")
+                            (physical . ((color . "red")
+                                         (shape . "round")))
+                            (varieties . (((name . "red delicious"))
+                                          ((name . "granny smith")))))
+                           ((name . "banana")
+                            (varieties . (((name . "plantain"))))))))
                ))
         (ref '(
                "[[fruits]]
@@ -106,19 +106,19 @@ See [org#Drawers](https://www.gnu.org/software/emacs/manual/html_mono/org.html#D
     name = \"red delicious\"
   [[fruits.varieties]]
     name = \"granny smith\""
-               ;; "[[fruits]]
-               ;; name = \"apple\"
-               ;; [fruits.physical]
-               ;; color = \"red\"
-               ;; shape = \"round\"
-               ;; [[fruits.varieties]]
-               ;; name = \"red delicious\"
-               ;; [[fruits.varieties]]
-               ;; name = \"granny smith\"
-               ;; [[fruits]]
-               ;; name = \"banana\"
-               ;; [[fruits.varieties]]
-               ;; name = \"plantain\""
+               "[[fruits]]
+  name = \"apple\"
+  [fruits.physical]
+    color = \"red\"
+    shape = \"round\"
+  [[fruits.varieties]]
+    name = \"red delicious\"
+  [[fruits.varieties]]
+    name = \"granny smith\"
+[[fruits]]
+  name = \"banana\"
+  [[fruits.varieties]]
+    name = \"plantain\""
                ))
         out)
     (dolist (el inp)
