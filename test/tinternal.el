@@ -35,6 +35,10 @@
                ((a . 1)
                 (b . ((c . 3)
                       (d . 4))))
+               ;; Nested TTA
+               ((a . 1)
+                (b . (((c . 3))
+                      ((c . 300)))))
                )))
     (dolist (el inp)
       (should (equal t (tomelr--toml-table-p el))))))

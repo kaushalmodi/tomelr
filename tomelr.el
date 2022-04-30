@@ -292,12 +292,24 @@ Definition of a TOML Table (TT):
                  ;; (when (listp elem)
                  ;;   (message "  [tomelr--toml-table-p DBG] sub-elem 0 = %S, type = %S, len = %d"
                  ;;            (car elem) (type-of (car elem)) (safe-length (car elem))))
-                 (or (and (consp elem)
-                          (= 1 (safe-length elem))
-                          (not (consp (car elem))))
-                     (and (listp elem)
-                          (symbolp (car elem))
-                          (tomelr--toml-table-p (cdr elem)))))
+                 (or
+                  ;; Basic TT case
+                  ;; ((a . 1)
+                  ;;  (b . 2))
+                  (and (consp elem)
+                       (= 1 (safe-length elem))
+                       (not (consp (car elem))))
+                  (and (listp elem)
+                       (symbolp (car elem))
+                       (or
+                        ;; Nested TT case
+                        ;; ((b . ((c . 3)
+                        ;;        (d . 4))))
+                        (tomelr--toml-table-p (cdr elem))
+                        ;; Nested TTA case
+                        ;; ((b . (((c . 3))
+                        ;;        ((c . 300)))))
+                        (tomelr--toml-table-array-p (cdr elem))))))
                object)
               t)
              (t

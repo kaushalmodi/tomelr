@@ -83,6 +83,9 @@ See [org#Drawers](https://www.gnu.org/software/emacs/manual/html_mono/org.html#D
   (let ((inp '(
                ((fruits . (((varieties . (((name . "red delicious"))
                                           ((name . "granny smith"))))))))
+               ((fruits . (((name . "apple")
+                            (varieties . (((name . "red delicious"))
+                                          ((name . "granny smith"))))))))
                ;; ((fruits . (((name . "apple")
                ;;              (physical . ((color . "red")
                ;;                           (shape . "round")))
@@ -91,7 +94,14 @@ See [org#Drawers](https://www.gnu.org/software/emacs/manual/html_mono/org.html#D
                ;;             ((name . "banana")
                ;;              (varieties . (((name . "plantain"))))))))
                ))
-        (ref '("[[fruits]]
+        (ref '(
+               "[[fruits]]
+  [[fruits.varieties]]
+    name = \"red delicious\"
+  [[fruits.varieties]]
+    name = \"granny smith\""
+               "[[fruits]]
+  name = \"apple\"
   [[fruits.varieties]]
     name = \"red delicious\"
   [[fruits.varieties]]
