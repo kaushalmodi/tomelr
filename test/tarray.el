@@ -25,15 +25,19 @@
 (require 'tomelr)
 
 ;;;; Simple arrays
-(ert-deftest test-array ()
-  (let ((inp '(((integers . (1 2 3)))
+(ert-deftest test-basic-arrays ()
+  (let ((inp '(
+               ((integers . (1 2 3)))
                ((integers2 . [1 2 3]))    ;Same as above
                ((colors . ("red" "yellow" "green")))
-               ((numbers . (0.1 0.2 0.5 1 2 5))))) ;Mixed-type arrays are allowed
-        (ref '("integers = [ 1, 2, 3 ]"
+               ((numbers . (0.1 0.2 0.5 1 2 5))) ;Mixed-type arrays are allowed
+               ))
+        (ref '(
+               "integers = [ 1, 2, 3 ]"
                "integers2 = [ 1, 2, 3 ]"
                "colors = [ \"red\", \"yellow\", \"green\" ]"
-               "numbers = [ 0.1, 0.2, 0.5, 1, 2, 5 ]"))
+               "numbers = [ 0.1, 0.2, 0.5, 1, 2, 5 ]"
+               ))
         out)
     (dolist (el inp)
       (push (tomelr-encode el) out))
