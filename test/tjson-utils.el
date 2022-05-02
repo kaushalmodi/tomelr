@@ -46,6 +46,7 @@
                (a 1)
                ;; FIXME: `json-alist-p' returns non-nil for below TTA as well.
                ;; ((:a 1))                ;This is an array of TOML table
+               [(:a 1)]                ;This is an array of TOML table
                (((a . 1)))             ;This is an array of TOML table
                )))
     (dolist (el inp)

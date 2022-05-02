@@ -45,6 +45,24 @@
       (push (tomelr-encode el) out))
     (should (equal ref (nreverse out)))))
 
+;;;; TT with a key with an array value
+(ert-deftest test-table-array-val ()
+  (let ((inp '(
+               ((dog . ((legs . 4)
+                        (eyes . 2)
+                        (friends . ("poo" "boo")))))
+               ))
+        (ref '(
+               "[dog]
+  legs = 4
+  eyes = 2
+  friends = [ \"poo\", \"boo\" ]"
+               ))
+        out)
+    (dolist (el inp)
+      (push (tomelr-encode el) out))
+    (should (equal ref (nreverse out)))))
+
 ;;;; Nested tables
 (ert-deftest test-nested-table ()
   (let ((inp '(((table-1 . ((table-1a . ((key1 . "some string")

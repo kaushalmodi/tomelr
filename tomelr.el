@@ -241,58 +241,9 @@ Signal `tomelr-key-format' if it cannot be encoded as a string."
 
 ;;;; Objects
 (defun tomelr--toml-table-p (object)
-  "Return non-nil if OBJECT can represent a TOML Table.
-
-Definition of a TOML Table (TT):
-
-- OBJECT is TT if it is of type ((KEY1 . VAL1) (KEY2 . VAL2) ..)
-- If OBJECT if of type ((SYMBOL . (WHATEVER))), it's possible that
-  OBJECT is a nested TT.  In that case, pass (WHATEVER) to
-  `tomelr--toml-table-p'."
-  (let (tablep)
-    ;; (message "[tomelr--toml-table-p DBG] object = %S, type = %S, len = %d"
-    ;;          object (type-of object) (safe-length object))
-    (when (listp object)
-      ;; (message "[tomelr--toml-table-p DBG] first elem = %S, type = %S, len = %d"
-      ;;          (car object) (type-of (car object)) (safe-length (car object)))
-      (setq tablep
-            (cond
-             ((json-plist-p object)
-              t)
-             ((seq-every-p
-               ;; Ensure that every element in the `object' is a (KEY
-               ;; . VAL) kind of cons.
-               (lambda (elem)
-                 ;; (message "  [tomelr--toml-table-p DBG] elem = %S, type = %S, len = %d"
-                 ;;          elem (type-of elem) (safe-length elem))
-                 ;; (when (listp elem)
-                 ;;   (message "  [tomelr--toml-table-p DBG] sub-elem 0 = %S, type = %S, len = %d"
-                 ;;            (car elem) (type-of (car elem)) (safe-length (car elem))))
-                 (or
-                  ;; Basic TT case
-                  ;; ((a . 1)
-                  ;;  (b . 2))
-                  (and (consp elem)
-                       (= 1 (safe-length elem))
-                       (not (consp (car elem))))
-                  (and (listp elem)
-                       (symbolp (car elem))
-                       (or
-                        ;; Nested TT case
-                        ;; ((b . ((c . 3)
-                        ;;        (d . 4))))
-                        (tomelr--toml-table-p (cdr elem))
-                        ;; Nested TTA case
-                        ;; ((b . (((c . 3))
-                        ;;        ((c . 300)))))
-                        (tomelr--toml-table-array-p (cdr elem))))))
-               object)
-              t)
-             (t
-              nil))))
-    ;; (message "[tomelr--toml-table-p DBG] tablep = %S" tablep)
-    ;; (message "=====")
-    tablep))
+  "Return non-nil if OBJECT can represent a TOML Table."
+  (or (json-alist-p object)
+      (json-plist-p object)))
 
 (defun tomelr--print-pair (key val)
   "Insert TOML representation of KEY - VAL pair at point."
