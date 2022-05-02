@@ -240,9 +240,32 @@ Signal `tomelr-key-format' if it cannot be encoded as a string."
       (signal 'tomelr-key-format (list key))))
 
 ;;;; Objects
+;; `tomelr-alist-p' is a slightly modified version of `json-alist-p'.
+;; It fixes this scenario: (json-alist-p '((:a 1))) return t, which is wrong.
+;; '((:a 1)) is an array of plist format maps, and not an alist.
+;; (tomelr-alist-p '((:a 1))) returns nil as expected.
+(defun tomelr-alist-p (list)
+  "Non-nil if and only if LIST is an alist with simple keys."
+  (declare (pure t) (side-effect-free error-free))
+  (while (and (consp (car-safe list))
+              (not (json-plist-p (car-safe list)))
+              (atom (caar list)))
+    ;; (message "[tomelr-alist-p DBG] INSIDE list = %S, car = %S, caar = %S, atom of caar = %S"
+    ;;          list (car-safe list) (caar list) (atom (caar list)))
+    (setq list (cdr list)))
+  ;; (message "[tomelr-alist-p DBG] out 2 list = %S, is alist? %S" list (null list))
+  (null list))
+
 (defun tomelr--toml-table-p (object)
-  "Return non-nil if OBJECT can represent a TOML Table."
-  (or (json-alist-p object)
+  "Return non-nil if OBJECT can represent a TOML Table.
+
+Recognize both alist and plist format maps as TOML Tables.
+
+Examples:
+
+- Alist format: \\='((a . 1) (b . \"foo\"))
+- Plist format: \\='(:a 1 :b \"foo\")"
+  (or (tomelr-alist-p object)
       (json-plist-p object)))
 
 (defun tomelr--print-pair (key val)
@@ -273,7 +296,7 @@ This works for any MAP satisfying `mapp'."
 ;;;; Lists (including alists and plists)
 (defun tomelr--print-list (list)
   "Insert a TOML representation of LIST at point."
-  (cond ((or (json-alist-p list)
+  (cond ((or (tomelr-alist-p list)
              (json-plist-p list))
          (tomelr--print-map list))
         ((listp list)
@@ -288,36 +311,11 @@ Definition of a TOML Table Array (TTA):
 
 - OBJECT is TTA if it is of type ((TT1) (TT2) ..) where each element is a
   TOML Table (TT)."
-  (let (ttap)
-    (when (and (not (tomelr--toml-table-p object))
-               (or (listp object)
-                   (vectorp object)))
-      ;; (message "[tomelr--toml-table-array-p DBG] object = %S, type = %S, len = %d"
-      ;;          object (type-of object) (safe-length object))
-      (setq ttap (cond
-                  ((seq-every-p
-                    (lambda (elem)
-                      ;; (message "  [tomelr--toml-table-array-p DBG] elem = %S, type = %S, len = %d"
-                      ;;          elem (type-of elem) (safe-length elem))
-                      ;; (when (listp elem)
-                      ;;   (message "  [tomelr--toml-table-array-p DBG] sub-elem 0 = %S, type = %S, len = %d"
-                      ;;            (car elem) (type-of (car elem)) (safe-length (car elem))))
-                      (or
-                       (tomelr--toml-table-p elem)
-                       ;; Handling the case of a nested TTA.
-                       ;; Example:                        (((a . (((b . 2))))))
-                       (and (listp elem)                 ; ((a . (((b . 2)))))
-                            (listp (car elem))           ;  (a . (((b . 2))))
-                            (symbolp (car (car elem)))   ;   a  <- symbol
-                            ;;                           --(((b . 2)))-  <-- This will be a TTA.
-                            (tomelr--toml-table-array-p (cdr (car elem))))))
-                    object)
-                   t)
-                  (t
-                   nil))))
-    ;; (message "[tomelr--toml-table-array-p DBG] ttap = %S" ttap)
-    ;; (message "=====")
-    ttap))
+  (when (or (proper-list-p object)
+            (vectorp object))
+    (seq-every-p
+     (lambda (elem) (tomelr--toml-table-p elem))
+     object)))
 
 (defun tomelr--print-tta-key ()
   "Print TOML Table Array key."

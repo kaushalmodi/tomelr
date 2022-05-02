@@ -24,8 +24,34 @@
 ;;; Code:
 (require 'tomelr)
 
+(ert-deftest test-internal-tomelr-alist-p-true ()
+  (let ((inp '(
+               ((a . 1))
+               ((a . 1) (b . 2))
+               ;; Nested TT
+               ((a . 1)
+                (b . ((c . 3)
+                      (d . 4))))
+               ;; Nested TTA
+               ((a . 1)
+                (b . (((c . 3))
+                      ((c . 300)))))
+               )))
+    (dolist (el inp)
+      (should (equal t (tomelr-alist-p el))))))
+
+(ert-deftest test-internal-tomelr-alist-p-false ()
+  (let ((inp '(
+               (a 1)
+               ((:a 1))                ;This is an array of TOML table
+               [(:a 1)]                ;This is an array of TOML table
+               (((a . 1)))             ;This is an array of TOML table
+               )))
+    (dolist (el inp)
+      (should (equal nil (tomelr-alist-p el))))))
+
 ;;;; tomelr--toml-table-p
-(ert-deftest test-internal-valid-toml-tables ()
+(ert-deftest test-internal-toml-table-true ()
   (let ((inp '(
                ((a . 1))
                (:a 1)
@@ -46,9 +72,7 @@
 (ert-deftest test-internal-toml-table-false ()
   (let ((inp '(
                (a 1)
-               ;; FIXME: TTA with plist and list notation doesn't get recognized as one
-               ;; ((:a 1))                ;This is an array of TOML table
-               ;;
+               ((:a 1))                ;This is an array of TOML table
                [(:a 1)]                ;This is an array of TOML table
                (((a . 1)))             ;This is an array of TOML table
                )))
@@ -80,17 +104,16 @@
     (dolist (el inp)
       (should (equal t (tomelr--toml-table-array-p el))))))
 
-;; FIXME: TTA with list notation + plist doesn't work
-;; (ert-deftest test-internal-tta-plist-list-notation-true ()
-;;   (let ((inp '(
-;;                ;; TTA with 1 table of 1 key-val pair
-;;                ((:a  1))
-;;                ;; TTA with 1 table nesting another TTA
-;;                ((:a 1 :b 2)
-;;                 (:a 100 :b 200))
-;;                )))
-;;     (dolist (el inp)
-;;       (should (equal t (tomelr--toml-table-array-p el))))))
+(ert-deftest test-internal-tta-plist-list-notation-true ()
+  (let ((inp '(
+               ;; TTA with 1 table of 1 key-val pair
+               ((:a  1))
+               ;; TTA with 1 table nesting another TTA
+               ((:a 1 :b 2)
+                (:a 100 :b 200))
+               )))
+    (dolist (el inp)
+      (should (equal t (tomelr--toml-table-array-p el))))))
 
 (ert-deftest test-internal-tta-false ()
   (let ((inp '(
