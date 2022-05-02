@@ -55,5 +55,43 @@
       (push (tomelr-encode el) out))
     (should (equal ref (nreverse out)))))
 
+;;;; Integer Coercing
+(ert-deftest test-coerce-integer-yes ()
+  (let ((tomelr-coerce-to-types '(integer))
+        (inp '(
+               ((key . "-123"))
+               ((key . "0"))
+               ((key . "123"))
+               ;; Number too large~
+               ;; (fixnump (string-to-number "10040216507682529280")) ;=> nil
+               ;; So this number won't be coerced.
+               ((key . "10040216507682529280"))
+               ))
+        (ref '(
+               "key = -123"
+               "key = 0"
+               "key = 123"
+               "key = \"10040216507682529280\""
+               ))
+        out)
+    (dolist (el inp)
+      (push (tomelr-encode el) out))
+    (should (equal ref (nreverse out)))))
+
+(ert-deftest test-coerce-integer-no ()
+  (let ((tomelr-coerce-to-types '())
+        (inp '(
+               ((key . "123"))
+               ((key . "10040216507682529280"))
+               ))
+        (ref '(
+               "key = \"123\""
+               "key = \"10040216507682529280\""
+               ))
+        out)
+    (dolist (el inp)
+      (push (tomelr-encode el) out))
+    (should (equal ref (nreverse out)))))
+
 
 (provide 'tcoerce)

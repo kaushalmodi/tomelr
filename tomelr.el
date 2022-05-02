@@ -42,7 +42,7 @@
   "String used for a single indentation level during encoding.
 This value is repeated for each further nested element.")
 
-(defvar tomelr-coerce-to-types '(boolean)
+(defvar tomelr-coerce-to-types '(boolean integer)
   "List of TOML types to which the TOML strings will be attempted to be coerced.
 
 Valid symbols that can be present in this list: boolean, integer, float
@@ -240,8 +240,24 @@ Return nil if OBJECT cannot be encoded as a TOML string."
      ((equal type 'table-array-key)
       (princ (format "[[%s]]" (string-join tomelr--print-table-hierarchy "."))))
      ((stringp object)
-      ;; (message "[tomelr--print-stringlike DBG] %S is string" object)
-      (tomelr--print-string sym-name type))
+      (cond
+       ;; If it an integer that can be stored in the system as a
+       ;; fixnum.  For example, if `object' is "10040216507682529280"
+       ;; that needs more than 64 bits to be stored as a signed
+       ;; integer, it will be automatically stored as a float.  So
+       ;; (integerp (string-to-number object)) will return nil [or
+       ;; `fixnump' instead of `integerp' in Emacs 27 or newer]
+       ;; https://github.com/toml-lang/toml#integer
+       ;; Integer examples: 7, +7, -7, 7_000
+       ((and (member 'integer tomelr-coerce-to-types)
+             (string-match-p "\\`[+-]?[[:digit:]_]+\\'" object)
+             (if (functionp #'fixnump) ;`fixnump' and `bignump' get introduced in Emacs 27.x
+                 (fixnump (string-to-number object))
+               (integerp (string-to-number object)))) ;On older Emacsen, `integerp' behaved the same as the new `fixnump'
+        (princ object))
+       (t
+        ;; (message "[tomelr--print-stringlike DBG] %S is string" object)
+        (tomelr--print-string sym-name type))))
      ((keywordp object)
       ;; (message "[tomelr--print-stringlike DBG] %S is keyword" object)
       (tomelr--print-string sym-name 'keyword))
