@@ -290,8 +290,7 @@ This works for any MAP satisfying `mapp'."
 ;;;; Lists (including alists and plists)
 (defun tomelr--print-list (list)
   "Insert a TOML representation of LIST at point."
-  (cond ((or (tomelr-alist-p list)
-             (json-plist-p list))
+  (cond ((tomelr--toml-table-p list)
          (tomelr--print-map list))
         ((listp list)
          (tomelr--print-array list))
