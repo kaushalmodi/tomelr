@@ -78,15 +78,28 @@
 
 ;;;; Scalar - String
 (ert-deftest test-scalar-string ()
-  (let ((inp '(((string1 . "Roses are red"))
+  (let ((inp '(
+               ((string1 . "Roses are red"))
                ((string2 . "Roses are red\nViolets are blue")) ;Newline in string
-               ((string3 . "\"Hello!\"")))) ;Quote in string
-        (ref '("string1 = \"Roses are red\""
+               ((string3 . "\"Hello!\"")) ;Quote in string
+               ((string4 . "Line 1\n\nLine 3\n\n  Line 5 with 2 space indentation\n\nLine 7")) ;Blank lines in string
+               ))
+        (ref '(
+               "string1 = \"Roses are red\""
                "string2 = \"\"\"
 Roses are red
 Violets are blue\"\"\""
                "string3 = \"\"\"
-\"Hello!\"\"\"\""))
+\"Hello!\"\"\"\""
+               "string4 = \"\"\"
+Line 1
+
+Line 3
+
+  Line 5 with 2 space indentation
+
+Line 7\"\"\""
+               ))
         out)
     (dolist (el inp)
       (push (tomelr-encode el) out))
