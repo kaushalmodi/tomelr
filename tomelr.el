@@ -4,7 +4,7 @@
 ;; URL: https://github.com/kaushalmodi/tomelr
 ;; Package-Requires: ((emacs "26.3"))
 ;; Keywords: TOML, config
-;; Version: v0.0.1
+;; Version: v0.0.2
 
 ;; This file is not part of GNU Emacs.
 
