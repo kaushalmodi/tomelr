@@ -201,6 +201,7 @@ Possible values of TYPE are `normal-key', `table-key',
 `table-array-key', `keyword', or nil.
 
 Return nil if OBJECT cannot be encoded as a TOML string."
+  ;; (message "[tomelr--print-stringlike DBG] object = %S" object)
   (let ((sym-name (cond ((and type (stringp object))
                          ;; https://toml.io/en/v1.0.0#keys
                          ;; Bare keys may only contain ASCII letters, ASCII digits,
@@ -216,7 +217,15 @@ Return nil if OBJECT cannot be encoded as a TOML string."
                         ((keywordp object)
                          (string-trim-left (symbol-name object) ":"))
                         ((symbolp object)
-                         (symbol-name object)))))
+                         (let ((str (symbol-name object)))
+                           (unless (or ;; RFC 3339 formatted date-time with offset
+                                       (string-match-p tomelr--date-time-regexp str)
+                                       (string-match-p "\\`[A-Za-z0-9_-]+\\'" str))
+                             ;; Wrap string in double-quotes if it's
+                             ;; neither a date-time symbol not
+                             ;; contains only A-Za-z0-9_- chars.
+                             (setq str (format "\"%s\"" str)))
+                           str)))))
     (when (member type '(table-key table-array-key))
       ;; (message "[tomelr--print-stringlike DBG] %S is symbol, type = %S, depth = %d"
       ;;          object type tomelr--print-indentation-depth)
