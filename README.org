@@ -15,6 +15,109 @@ This library started off by extracting the JSON Encoding pieces from
 the Emacs core library [[https://git.savannah.gnu.org/cgit/emacs.git/tree/lisp/json.el][*json.el*]].
 
 It was then refactored to meet the specification defined below.
+* API
+This library has only one entry point for simplicity: ~tomelr-encode~.
+
+- Input :: Lisp data expression in Alist or Plist format
+- Ouput :: TOML string
+** Example
+*** Alist data
+#+begin_src emacs-lisp :eval no :noweb-ref data-example-alist
+'((title . "Some Title") ;String
+  (author . ("fn ln"))   ;List
+  (description . "some long description\nthat spans multiple\nlines") ;Multi-line string
+  (date . 2022-03-14T01:49:00-04:00)    ;RFC 3339 date format
+  (tags . ("tag1" "tag2"))
+  (draft . "false")                     ;Boolean
+  (versions . ((emacs . "28.1.50") (org . "release_9.5-532-gf6813d"))) ;Map or TOML Table
+  (org_logbook . (((timestamp . 2022-04-08T14:53:00-04:00) ;Array of maps or TOML Tables
+                   (note . "This note addition prompt shows up on typing the `C-c C-z` binding.\nSee [org#Drawers](https://www.gnu.org/software/emacs/manual/html_mono/org.html#Drawers)."))
+                  ((timestamp . 2018-09-06T11:45:00-04:00)
+                   (note . "Another note **bold** _italics_."))
+                  ((timestamp . 2018-09-06T11:37:00-04:00)
+                   (note . "A note `mono`.")))))
+#+end_src
+
+#+begin_src emacs-lisp :noweb yes :exports none :wrap src toml
+(tomelr-encode
+  <<data-example-alist>>)
+#+end_src
+
+#+RESULTS:
+#+begin_src toml
+title = "Some Title"
+author = [ "fn ln" ]
+description = """
+some long description
+that spans multiple
+lines"""
+date = 2022-03-14T01:49:00-04:00
+tags = [ "tag1", "tag2" ]
+draft = false
+[versions]
+  emacs = "28.1.50"
+  org = "release_9.5-532-gf6813d"
+[[org_logbook]]
+  timestamp = 2022-04-08T14:53:00-04:00
+  note = """
+This note addition prompt shows up on typing the `C-c C-z` binding.
+See [org#Drawers](https://www.gnu.org/software/emacs/manual/html_mono/org.html#Drawers)."""
+[[org_logbook]]
+  timestamp = 2018-09-06T11:45:00-04:00
+  note = "Another note **bold** _italics_."
+[[org_logbook]]
+  timestamp = 2018-09-06T11:37:00-04:00
+  note = "A note `mono`."
+#+end_src
+*** Plist data
+#+begin_src emacs-lisp :eval no :noweb-ref data-example-plist
+'(:title "Some Title" ;String
+  :author ("fn ln")   ;List
+  :description "some long description\nthat spans multiple\nlines" ;Multi-line string
+  :date 2022-03-14T01:49:00-04:00    ;RFC 3339 date format
+  :tags ("tag1" "tag2")
+  :draft "false"                     ;Boolean
+  :versions (:emacs "28.1.50" :org "release_9.5-532-gf6813d") ;Map or TOML Table
+  :org_logbook ((:timestamp 2022-04-08T14:53:00-04:00  ;Array of maps or TOML Tables
+                 :note "This note addition prompt shows up on typing the `C-c C-z` binding.\nSee [org#Drawers](https://www.gnu.org/software/emacs/manual/html_mono/org.html#Drawers).")
+                (:timestamp 2018-09-06T11:45:00-04:00
+                 :note "Another note **bold** _italics_.")
+                (:timestamp 2018-09-06T11:37:00-04:00
+                 :note "A note `mono`.")))
+#+end_src
+*** TOML Output
+You will get the below TOML output for either of the above input data.
+#+begin_src emacs-lisp :noweb yes :exports results :wrap src toml
+(tomelr-encode
+  <<data-example-plist>>)
+#+end_src
+
+#+RESULTS:
+#+begin_src toml
+title = "Some Title"
+author = [ "fn ln" ]
+description = """
+some long description
+that spans multiple
+lines"""
+date = 2022-03-14T01:49:00-04:00
+tags = [ "tag1", "tag2" ]
+draft = false
+[versions]
+  emacs = "28.1.50"
+  org = "release_9.5-532-gf6813d"
+[[org_logbook]]
+  timestamp = 2022-04-08T14:53:00-04:00
+  note = """
+This note addition prompt shows up on typing the `C-c C-z` binding.
+See [org#Drawers](https://www.gnu.org/software/emacs/manual/html_mono/org.html#Drawers)."""
+[[org_logbook]]
+  timestamp = 2018-09-06T11:45:00-04:00
+  note = "Another note **bold** _italics_."
+[[org_logbook]]
+  timestamp = 2018-09-06T11:37:00-04:00
+  note = "A note `mono`."
+#+end_src
 * Limitation
 Right now, the scalars and tables/array of tables does not get ordered
 in the right order automatically. So the user needs to ensure that the
