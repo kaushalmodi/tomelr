@@ -590,7 +590,9 @@ CLOSED: [2022-04-29 Fri 14:30]
 '((table-1 . ((table-1a . ((key1 . "some string")
                            (key2 . 123)))
               (table-1b . ((key1 . "foo")
-                           (key2 . 98765))))))
+                           (key2 . 98765)))))
+  (menu . (("auto weight" . ((weight . 4033)
+                             (identifier . "foo"))))))
 #+end_src
 **** TOML
 #+begin_src emacs-lisp :noweb yes :exports results :wrap src toml
@@ -607,6 +609,10 @@ CLOSED: [2022-04-29 Fri 14:30]
   [table-1.table-1b]
     key1 = "foo"
     key2 = 98765
+[menu]
+  [menu."auto weight"]
+    weight = 4033
+    identifier = "foo"
 #+end_src
 **** JSON Reference
 #+begin_src emacs-lisp :noweb yes :exports results
@@ -625,6 +631,12 @@ CLOSED: [2022-04-29 Fri 14:30]
     "table-1b": {
       "key1": "foo",
       "key2": 98765
+    }
+  },
+  "menu": {
+    "auto weight": {
+      "weight": 4033,
+      "identifier": "foo"
     }
   }
 }

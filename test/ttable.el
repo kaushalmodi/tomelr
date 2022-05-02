@@ -81,5 +81,38 @@
       (push (tomelr-encode el) out))
     (should (equal ref (nreverse out)))))
 
+(ert-deftest test-nested-table-string-keys ()
+  (let ((inp '(
+               ((table-1 . (("some key" . ((key1 . "some string")
+                                           (key2 . 123))))))
+               ((table-1 . ((table-1a . ((key1 . "some string")
+                                         (key2 . 123)))
+                            (table-1b . ((key1 . "foo")
+                                         (key2 . 98765)))))
+                (menu . (("auto weight" . ((weight . 4033)
+                                           (identifier . "foo"))))))
+               ))
+        (ref '(
+               "[table-1]
+  [table-1.\"some key\"]
+    key1 = \"some string\"
+    key2 = 123"
+               "[table-1]
+  [table-1.table-1a]
+    key1 = \"some string\"
+    key2 = 123
+  [table-1.table-1b]
+    key1 = \"foo\"
+    key2 = 98765
+[menu]
+  [menu.\"auto weight\"]
+    weight = 4033
+    identifier = \"foo\""
+               ))
+        out)
+    (dolist (el inp)
+      (push (tomelr-encode el) out))
+    (should (equal ref (nreverse out)))))
+
 
 (provide 'ttable)

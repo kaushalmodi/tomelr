@@ -131,6 +131,7 @@ set to `keyword'.
 
 Return the same STRING passed as input."
   ;; (message "[tomelr--print-string DBG] string = `%s'" string)
+  (setq string (string-trim string "\"" "\""))
   (let ((special-chars '((?b . ?\b)     ;U+0008
                          (?f . ?\f)     ;U+000C
                          (?\\ . ?\\)))
@@ -181,7 +182,14 @@ Possible value of TYPE are `table', `table-array' or nil.
 
 Return nil if OBJECT cannot be encoded as a TOML string."
   (let ((sym-name (cond ((stringp object)
-                         object)
+                         ;; https://toml.io/en/v1.0.0#keys
+                         ;; Bare keys may only contain ASCII letters, ASCII digits,
+                         ;; underscores, and dashes (A-Za-z0-9_-).
+                         (if (string-match-p "\\`[A-Za-z0-9_-]+\\'" object)
+                             object
+                           ;; Wrap string in double-quotes if it
+                           ;; doesn't contain only A-Za-z0-9_- chars.
+                           (format "\"%s\"" object)))
                         ;; Symbol beginning with `:', like `:some_key'
                         ((keywordp object)
                          (string-trim-left (symbol-name object) ":"))

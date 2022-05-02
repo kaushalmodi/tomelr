@@ -24,6 +24,7 @@
 (require 'tjson-utils)
 (require 'tinternal)
 
+(require 'tkey)
 (require 'tscalar)
 (require 'tnil)
 (require 'tarray)

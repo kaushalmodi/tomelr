@@ -30,8 +30,12 @@
                ((a . 1) (b . 2))
                ;; Nested TT
                ((a . 1)
-                (b . ((c . 3)
-                      (d . 4))))
+                (b . ((c . ((d . 3)
+                            (e . 4))))))
+               ;; Nested TT with string key
+               ((a . 1)
+                (b . (("some key" . ((d . 3)
+                                     (e . 4))))))
                ;; Nested TTA
                ((a . 1)
                 (b . (((c . 3))
