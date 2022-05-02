@@ -129,9 +129,7 @@ Optional TYPE arg gives more information about the input STRING.
 For example, if the string is the name of a TOML key, it will be
 set to `keyword'.
 
-Return the same STRING passed as input.  See
-`tomelr-encode-string' instead if you need a function that
-returns the TOML representation as a string."
+Return the same STRING passed as input."
   ;; (message "[tomelr--print-string DBG] string = `%s'" string)
   (let ((special-chars '((?b . ?\b)     ;U+0008
                          (?f . ?\f)     ;U+000C
@@ -175,10 +173,6 @@ returns the TOML representation as a string."
                      (format "u%04x" char)))))
     (and end-q (insert end-q))
     string))
-
-(defun tomelr-encode-string (string)
-  "Return a TOML representation of STRING."
-  (tomelr--with-output-to-string (tomelr--print-string string)))
 
 (defun tomelr--print-stringlike (object &optional type)
   "Insert OBJECT encoded as a TOML string at point.
@@ -324,8 +318,7 @@ Definition of a TOML Table Array (TTA):
    (format "[[%s]]" (string-join tomelr--print-table-hierarchy "."))))
 
 (defun tomelr--print-array (array)
-  "Insert a TOML representation of ARRAY at point.
-See `tomelr-encode-array' that returns the same as a string."
+  "Insert a TOML representation of ARRAY at point."
   ;; (message "[tomelr--print-array DBG] array = %S, TTA = %S"
   ;;          array (tomelr--toml-table-array-p array))
   (cond
@@ -351,11 +344,6 @@ See `tomelr-encode-array' that returns the same as a string."
                 array)))
       (insert " "))
     (insert "]"))))
-
-(defun tomelr-encode-array (array)
-  "Return a TOML representation of ARRAY.
-ARRAY can also be a list."
-  (tomelr--with-output-to-string (tomelr--print-array array)))
 
 ;;;; Print wrapper
 (defun tomelr--print (object)
