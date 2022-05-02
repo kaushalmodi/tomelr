@@ -26,16 +26,20 @@
 
 ;;;; Simple tables
 (ert-deftest test-table ()
-  (let ((inp '(((table-1 . ((key1 . "some string")
+  (let ((inp '(
+               ((table-1 . ((key1 . "some string")
                             (key2 . 123))))
                ((table-2 . ((key1 . "another string")
-                            (key2 . 456))))))
-        (ref '("[table-1]
+                            (key2 . 456))))
+               ))
+        (ref '(
+               "[table-1]
   key1 = \"some string\"
   key2 = 123"
                "[table-2]
   key1 = \"another string\"
-  key2 = 456"))
+  key2 = 456"
+               ))
         out)
     (dolist (el inp)
       (push (tomelr-encode el) out))
