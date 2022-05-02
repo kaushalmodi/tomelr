@@ -21,6 +21,7 @@
 
 (setq load-prefer-newer t)
 
+(require 'tjson-utils)
 (require 'tinternal)
 
 (require 'tscalar)
