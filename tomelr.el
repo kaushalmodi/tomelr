@@ -35,12 +35,21 @@
 
 ;;; Variables
 
-(defvar tomelr-false '(:false 'false "false")
+(defvar tomelr-false '(:false 'false)
   "S-exp values to be interpreted as TOML `false'.")
 
 (defvar tomelr-encoding-default-indentation "  "
   "String used for a single indentation level during encoding.
 This value is repeated for each further nested element.")
+
+(defvar tomelr-coerce-to-types '(boolean)
+  "List of TOML types to which the TOML strings will be attempted to be coerced.
+
+Valid symbols that can be present in this list: boolean, integer, float
+
+For example, if this list contains `boolean' and if a string
+value is exactly \"true\", it will coerce to TOML boolean
+`true'.")
 
 ;;;; Internal Variables
 (defvar tomelr--print-indentation-prefix "\n"
@@ -117,8 +126,16 @@ This macro sets up appropriate variable bindings for
 (defun tomelr--print-boolean (object)
   "Insert TOML boolean true or false at point if OBJECT is a boolean.
 Return nil if OBJECT is not recognized as a TOML boolean."
-  (prog1 (setq object (cond ((eq object t) "true")
-                            ((member object tomelr-false) "false")))
+  (prog1 (setq object (cond ((or
+                              (eq object t)
+                              (and (member 'boolean tomelr-coerce-to-types)
+                                   (equal object "true")))
+                             "true")
+                            ((or
+                              (member object tomelr-false)
+                              (and (member 'boolean tomelr-coerce-to-types)
+                                   (equal object "false")))
+                             "false")))
     (and object (insert object))))
 
 ;;;; Strings
