@@ -42,13 +42,6 @@
   "String used for a single indentation level during encoding.
 This value is repeated for each further nested element.")
 
-(defvar tomelr-encoding-object-sort-predicate nil
-  "Sorting predicate for TOML object keys during encoding.
-If nil, no sorting is performed.  Else, TOML object keys are
-ordered by the specified sort predicate during encoding.  For
-instance, setting this to `string<' will have TOML object keys
-ordered alphabetically.")
-
 ;;;; Internal Variables
 (defvar tomelr--print-indentation-prefix "\n"
   "String used to start indentation during encoding.")
@@ -91,22 +84,6 @@ Examples:
 
 
 ;;; Utilities
-
-(defun tomelr-alist-p (list)
-  "Non-nil if and only if LIST is an alist with simple keys."
-  (declare (pure t) (side-effect-free error-free))
-  (while (and (consp (car-safe list))
-              (atom (caar list))
-              (setq list (cdr list))))
-  (null list))
-
-(defun tomelr-plist-p (list)
-  "Non-nil if and only if LIST is a plist with keyword keys."
-  (declare (pure t) (side-effect-free error-free))
-  (while (and (keywordp (car-safe list))
-              (consp (cdr list))
-              (setq list (cddr list))))
-  (null list))
 
 (defmacro tomelr--with-output-to-string (&rest body)
   "Eval BODY in a temporary buffer bound to `standard-output'.
@@ -342,49 +319,14 @@ This works for any MAP satisfying `mapp'."
     (tomelr--with-indentation
       (map-do #'tomelr--print-pair map))))
 
-(defun tomelr--print-unordered-map (map)
-  "Insert a TOML representation of MAP at point, but optionally sort MAP first.
-
-If `tomelr-encoding-object-sort-predicate' is non-nil, this first
-transforms an unsortable MAP into a sortable alist.
-
-See `tomelr-encode-plist' that returns the same as a string."
-  (if (and tomelr-encoding-object-sort-predicate
-           (not (map-empty-p map)))
-      (tomelr--print-alist (map-pairs map) t)
-    (tomelr--print-map map)))
-
 ;;;; Lists (including alists and plists)
-(defun tomelr--print-alist (alist &optional destructive)
-  "Insert a TOML representation of ALIST at point.
-
-Sort ALIST first if `tomelr-encoding-object-sort-predicate' is
-non-nil.  Sorting can optionally be DESTRUCTIVE for speed.
-
-See `tomelr-encode-alist' that returns the same as a string."
-  (tomelr--print-map (if (and tomelr-encoding-object-sort-predicate alist)
-                         (sort (if destructive alist (copy-sequence alist))
-                               (lambda (a b)
-                                 (funcall tomelr-encoding-object-sort-predicate
-                                          (car a) (car b))))
-                       alist)))
-
-;; The following two are unused but useful to keep around due to the
-;; inherent ambiguity of lists.
-(defun tomelr-encode-alist (alist)
-  "Return a TOML representation of ALIST."
-  (tomelr--with-output-to-string (tomelr--print-alist alist)))
-
-(defun tomelr-encode-plist (plist)
-  "Return a TOML representation of PLIST."
-  (tomelr--with-output-to-string (tomelr--print-unordered-map plist)))
-;;
-
 (defun tomelr--print-list (list)
   "Insert a TOML representation of LIST at point."
-  (cond ((tomelr-alist-p list) (tomelr--print-alist list))
-        ((tomelr-plist-p list) (tomelr--print-unordered-map list))
-        ((listp list)          (tomelr--print-array list))
+  (cond ((or (json-alist-p list)
+             (json-plist-p list))
+         (tomelr--print-map list))
+        ((listp list)
+         (tomelr--print-array list))
         ((signal 'tomelr-error (list list)))))
 
 ;;;; Arrays
@@ -482,7 +424,6 @@ See `tomelr-encode' that returns the same as a string."
         ((tomelr--print-stringlike object))
         ((numberp object)       (prin1 object))
         ((arrayp object)        (tomelr--print-array object))
-        ((hash-table-p object)  (tomelr--print-unordered-map object))
         ((signal 'tomelr-error (list object)))))
 
 
