@@ -1,10 +1,10 @@
-;;; tomelr.el --- Convert Emacs s-expressions to TOML           -*- lexical-binding: t -*-
+;;; tomelr.el --- Convert s-expressions to TOML           -*- lexical-binding: t -*-
 
 ;; Authors: Kaushal Modi <kaushal.modi@gmail.com>
 ;; URL: https://github.com/kaushalmodi/tomelr
 ;; Package-Requires: ((emacs "26.3"))
-;; Keywords: TOML, config
-;; Version: v0.0.2
+;; Keywords: data, tools
+;; Version: 0.0.2
 
 ;; This file is not part of GNU Emacs.
 
@@ -23,8 +23,8 @@
 
 ;;; Commentary:
 
-;; tomelr.el is a library that provides functions to convert Emacs
-;; symbolic expressions to TOML.
+;; tomelr.el is a library for converting Lisp data expressions to TOML
+;; (https://toml.io/en/).
 
 ;;; Code:
 
