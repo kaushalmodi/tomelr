@@ -4,7 +4,7 @@
 ;; URL: https://github.com/kaushalmodi/tomelr
 ;; Package-Requires: ((emacs "26.3"))
 ;; Keywords: data, tools
-;; Version: 0.0.2
+;; Version: 0.0.3
 
 ;; This file is not part of GNU Emacs.
 
