@@ -56,7 +56,7 @@
                "[dog]
   legs = 4
   eyes = 2
-  friends = [ \"poo\", \"boo\" ]"
+  friends = [\"poo\", \"boo\"]"
                ))
         out)
     (dolist (el inp)

@@ -332,7 +332,7 @@ Definition of a TOML Table Array (TTA):
                 (tomelr--print elt))
               array))))
    (t
-    (insert "[ ")
+    (insert "[")
     (unless (= 0 (length array))
       (tomelr--with-indentation
         (let ((first t))
@@ -341,8 +341,7 @@ Definition of a TOML Table Array (TTA):
                       (setq first nil)
                     (insert ", "))
                   (tomelr--print elt))
-                array)))
-      (insert " "))
+                array))))
     (insert "]"))))
 
 ;;;; Print wrapper

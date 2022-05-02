@@ -49,10 +49,10 @@
 str = \"abc\"
 bool_false = false
 bool_true = true
-int_list = [ 1, 2, 3 ]
-str_list = [ \"a\", \"b\", \"c\" ]
-bool_list = [ true, false, true, false ]
-list_of_lists = [ [ 1, 2 ], [ 3, 4, 5 ] ]
+int_list = [1, 2, 3]
+str_list = [\"a\", \"b\", \"c\"]
+bool_list = [true, false, true, false]
+list_of_lists = [[1, 2], [3, 4, 5]]
 [map]
   key1 = 123
   key2 = \"xyz\"

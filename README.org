@@ -19,7 +19,7 @@ It was then refactored to meet the specification defined below.
 This library has only one entry point for simplicity: ~tomelr-encode~.
 
 - Input :: Lisp data expression in Alist or Plist format
-- Ouput :: TOML string
+- Output :: TOML string
 ** Example
 *** Alist data
 #+begin_src emacs-lisp :eval no :noweb-ref data-example-alist
@@ -46,13 +46,13 @@ This library has only one entry point for simplicity: ~tomelr-encode~.
 #+RESULTS:
 #+begin_src toml
 title = "Some Title"
-author = [ "fn ln" ]
+author = ["fn ln"]
 description = """
 some long description
 that spans multiple
 lines"""
 date = 2022-03-14T01:49:00-04:00
-tags = [ "tag1", "tag2" ]
+tags = ["tag1", "tag2"]
 draft = false
 [versions]
   emacs = "28.1.50"
@@ -95,13 +95,13 @@ You will get the below TOML output for either of the above input data.
 #+RESULTS:
 #+begin_src toml
 title = "Some Title"
-author = [ "fn ln" ]
+author = ["fn ln"]
 description = """
 some long description
 that spans multiple
 lines"""
 date = 2022-03-14T01:49:00-04:00
-tags = [ "tag1", "tag2" ]
+tags = ["tag1", "tag2"]
 draft = false
 [versions]
   emacs = "28.1.50"
@@ -448,10 +448,10 @@ CLOSED: [2022-04-29 Fri 00:25]
 
 #+RESULTS:
 #+begin_src toml
-integers = [ 1, 2, 3 ]
-integers2 = [ 1, 2, 3 ]
-colors = [ "red", "yellow", "green" ]
-numbers = [ 0.1, 0.2, 0.5, 1, 2, 5 ]
+integers = [1, 2, 3]
+integers2 = [1, 2, 3]
+colors = ["red", "yellow", "green"]
+numbers = [0.1, 0.2, 0.5, 1, 2, 5]
 #+end_src
 **** JSON Reference
 #+begin_src emacs-lisp :noweb yes :exports results
@@ -502,8 +502,8 @@ CLOSED: [2022-04-29 Fri 00:34]
 
 #+RESULTS:
 #+begin_src toml
-nested_arrays_of_ints = [ [ 1, 2 ], [ 3, 4, 5 ] ]
-nested_mixed_array = [ [ 1, 2 ], [ "a", "b", "c" ] ]
+nested_arrays_of_ints = [[1, 2], [3, 4, 5]]
+nested_mixed_array = [[1, 2], ["a", "b", "c"]]
 #+end_src
 **** JSON Reference
 #+begin_src emacs-lisp :noweb yes :exports results
@@ -850,15 +850,15 @@ CLOSED: [2022-05-02 Mon 10:29]
 #+RESULTS:
 #+begin_src toml
 title = "Keyword Collection"
-author = [ "firstname1 lastname1", "firstname2 lastname2", "firstname3 lastname3" ]
-aliases = [ "/posts/keyword-concatenation", "/posts/keyword-merging" ]
-images = [ "image 1", "image 2" ]
-keywords = [ "keyword1", "keyword2", "three word keywords3" ]
-outputs = [ "html", "json" ]
-series = [ "series 1", "series 2" ]
-tags = [ "mega front-matter", "keys", "collection", "concatenation", "merging" ]
-categories = [ "cat1", "cat2" ]
-videos = [ "video 1", "video 2" ]
+author = ["firstname1 lastname1", "firstname2 lastname2", "firstname3 lastname3"]
+aliases = ["/posts/keyword-concatenation", "/posts/keyword-merging"]
+images = ["image 1", "image 2"]
+keywords = ["keyword1", "keyword2", "three word keywords3"]
+outputs = ["html", "json"]
+series = ["series 1", "series 2"]
+tags = ["mega front-matter", "keys", "collection", "concatenation", "merging"]
+categories = ["cat1", "cat2"]
+videos = ["video 1", "video 2"]
 draft = false
 categories_weight = 999
 tags_weight = 88
@@ -868,26 +868,26 @@ mybaz = "zoo"
 alpha = 1
 beta = "two words"
 gamma = 10
-animals = [ "dog", "cat", "penguin", "mountain gorilla" ]
-strings-symbols = [ "abc", "def", "two words" ]
-integers = [ 123, -5, 17, 1234 ]
-floats = [ 12.3, -5.0, -1.7e-05 ]
-booleans = [ true, false ]
+animals = ["dog", "cat", "penguin", "mountain gorilla"]
+strings-symbols = ["abc", "def", "two words"]
+integers = [123, -5, 17, 1234]
+floats = [12.3, -5.0, -1.7e-05]
+booleans = [true, false]
 [dog]
   legs = 4
   eyes = 2
-  friends = [ "poo", "boo" ]
+  friends = ["poo", "boo"]
 [header]
   image = "projects/Readingabook.jpg"
   caption = "stay hungry stay foolish"
 [collection]
   nothing = false
   nonnil = true
-  animals = [ "dog", "cat", "penguin", "mountain gorilla" ]
-  strings-symbols = [ "abc", "def", "two words" ]
-  integers = [ 123, -5, 17, 1234 ]
-  floats = [ 12.3, -5.0, -1.7e-05 ]
-  booleans = [ true, false ]
+  animals = ["dog", "cat", "penguin", "mountain gorilla"]
+  strings-symbols = ["abc", "def", "two words"]
+  integers = [123, -5, 17, 1234]
+  floats = [12.3, -5.0, -1.7e-05]
+  booleans = [true, false]
 [menu]
   [menu.foo]
     identifier = "keyword-collection"
@@ -898,11 +898,11 @@ booleans = [ true, false ]
   title = "The Image #:counter"
   [resources.params]
     foo = "bar"
-    floats = [ 12.3, -5.0, -1.7e-05 ]
-    strings-symbols = [ "abc", "def", "two words" ]
-    animals = [ "dog", "cat", "penguin", "mountain gorilla" ]
-    integers = [ 123, -5, 17, 1234 ]
-    booleans = [ true, false ]
+    floats = [12.3, -5.0, -1.7e-05]
+    strings-symbols = ["abc", "def", "two words"]
+    animals = ["dog", "cat", "penguin", "mountain gorilla"]
+    integers = [123, -5, 17, 1234]
+    booleans = [true, false]
     byline = "bep"
 [[resources]]
   src = "image-4.png"
@@ -1124,10 +1124,10 @@ int = 123
 str = "abc"
 bool_false = false
 bool_true = true
-int_list = [ 1, 2, 3 ]
-str_list = [ "a", "b", "c" ]
-bool_list = [ true, false, true, false ]
-list_of_lists = [ [ 1, 2 ], [ 3, 4, 5 ] ]
+int_list = [1, 2, 3]
+str_list = ["a", "b", "c"]
+bool_list = [true, false, true, false]
+list_of_lists = [[1, 2], [3, 4, 5]]
 [map]
   key1 = 123
   key2 = "xyz"

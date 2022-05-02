@@ -33,10 +33,10 @@
                ((numbers . (0.1 0.2 0.5 1 2 5))) ;Mixed-type arrays are allowed
                ))
         (ref '(
-               "integers = [ 1, 2, 3 ]"
-               "integers2 = [ 1, 2, 3 ]"
-               "colors = [ \"red\", \"yellow\", \"green\" ]"
-               "numbers = [ 0.1, 0.2, 0.5, 1, 2, 5 ]"
+               "integers = [1, 2, 3]"
+               "integers2 = [1, 2, 3]"
+               "colors = [\"red\", \"yellow\", \"green\"]"
+               "numbers = [0.1, 0.2, 0.5, 1, 2, 5]"
                ))
         out)
     (dolist (el inp)
@@ -47,8 +47,8 @@
 (ert-deftest test-array-of-arrays ()
   (let ((inp '(((nested_arrays_of_ints . [(1 2) (3 4 5)]))
                ((nested_mixed_array . [(1 2) ("a" "b" "c")]))))
-        (ref '("nested_arrays_of_ints = [ [ 1, 2 ], [ 3, 4, 5 ] ]"
-               "nested_mixed_array = [ [ 1, 2 ], [ \"a\", \"b\", \"c\" ] ]"))
+        (ref '("nested_arrays_of_ints = [[1, 2], [3, 4, 5]]"
+               "nested_mixed_array = [[1, 2], [\"a\", \"b\", \"c\"]]"))
         out)
     (dolist (el inp)
       (push (tomelr-encode el) out))
