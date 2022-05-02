@@ -113,19 +113,13 @@ This macro sets up appropriate variable bindings for
 
 ;;; Encoding
 
-;;;; Keywords
-(defun tomelr-encode-keyword (keyword)
-  "Encode KEYWORD as a TOML value."
-  (declare (side-effect-free t))
-  ;; (message "[tomelr-encode-keyword DBG] keyword = %S" keyword)
-  (cond ((eq keyword t)                "true")
-        ((member keyword tomelr-false) "false")))
-
-(defun tomelr--print-keyword (keyword)
-  "Insert KEYWORD as a TOML value at point.
-Return nil if KEYWORD is not recognized as a TOML keyword."
-  (prog1 (setq keyword (tomelr-encode-keyword keyword))
-    (and keyword (insert keyword))))
+;;;; Booleans
+(defun tomelr--print-boolean (object)
+  "Insert TOML boolean true or false at point if OBJECT is a boolean.
+Return nil if OBJECT is not recognized as a TOML boolean."
+  (prog1 (setq object (cond ((eq object t) "true")
+                            ((member object tomelr-false) "false")))
+    (and object (insert object))))
 
 ;;;; Strings
 (defun tomelr--print-string (string &optional type)
@@ -368,7 +362,7 @@ ARRAY can also be a list."
 (defun tomelr--print (object)
   "Insert a TOML representation of OBJECT at point.
 See `tomelr-encode' that returns the same as a string."
-  (cond ((tomelr--print-keyword object))
+  (cond ((tomelr--print-boolean object))
         ((listp object)         (tomelr--print-list object))
         ((tomelr--print-stringlike object))
         ((numberp object)       (prin1 object))
