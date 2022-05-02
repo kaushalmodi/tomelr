@@ -148,17 +148,18 @@ set to `keyword'.
 
 Return the same STRING passed as input."
   ;; (message "[tomelr--print-string DBG] string = `%s'" string)
-  (setq string (string-trim string "\"" "\""))
   (let ((special-chars '((?b . ?\b)     ;U+0008
                          (?f . ?\f)     ;U+000C
                          (?\\ . ?\\)))
-        (special-chars-re (rx (in ?\" ?\\ cntrl ?\u007F))) ;cntrl is same as (?\u0000 . ?\u001F)
+        (special-chars-re (rx (in cntrl ?\u007F)))
         begin-q end-q)
     (cond
-     ((equal type 'keyword))
+     ;; plist keywords, normal keys, table keys, table-array keys
+     (type)
      ((string-match-p tomelr--date-time-regexp string)) ;RFC 3339 formatted date-time with offset
-     ;; Use multi-line string quotation if the string contains a " char
-     ;; or a newline - """STRING"""
+     ;; Use multi-line string quotation if the string contains a "
+     ;; char or a newline - """STRING""", and only if the string
+     ;; doesn't have a "key type".
      ((string-match-p "\n\\|\"" string)
       ;; From https://toml.io/en/v1.0.0#string, Any Unicode
       ;; character may be used except those that must be escaped:
@@ -173,6 +174,7 @@ Return the same STRING passed as input."
       (setq begin-q "\"\"\"\n")
       (setq end-q "\"\"\""))
      (t                                 ;Basic quotation "STRING"
+      (setq special-chars-re (rx (in ?\" ?\\ cntrl ?\u007F))) ;cntrl is same as (?\u0000 . ?\u001F)
       (push '(?\" . ?\") special-chars)
       (push '(?t . ?\t) special-chars) ;U+0009
       (push '(?n . ?\n) special-chars) ;U+000A
@@ -195,10 +197,11 @@ Return the same STRING passed as input."
 (defun tomelr--print-stringlike (object &optional type)
   "Insert OBJECT encoded as a TOML string at point.
 
-Possible value of TYPE are `table', `table-array' or nil.
+Possible values of TYPE are `normal-key', `table-key',
+`table-array-key', `keyword', or nil.
 
 Return nil if OBJECT cannot be encoded as a TOML string."
-  (let ((sym-name (cond ((stringp object)
+  (let ((sym-name (cond ((and type (stringp object))
                          ;; https://toml.io/en/v1.0.0#keys
                          ;; Bare keys may only contain ASCII letters, ASCII digits,
                          ;; underscores, and dashes (A-Za-z0-9_-).
@@ -207,12 +210,14 @@ Return nil if OBJECT cannot be encoded as a TOML string."
                            ;; Wrap string in double-quotes if it
                            ;; doesn't contain only A-Za-z0-9_- chars.
                            (format "\"%s\"" object)))
+                        ((and (null type) (stringp object))
+                         object)
                         ;; Symbol beginning with `:', like `:some_key'
                         ((keywordp object)
                          (string-trim-left (symbol-name object) ":"))
                         ((symbolp object)
                          (symbol-name object)))))
-    (when type
+    (when (member type '(table-key table-array-key))
       ;; (message "[tomelr--print-stringlike DBG] %S is symbol, type = %S, depth = %d"
       ;;          object type tomelr--print-indentation-depth)
       (if (null (nth tomelr--print-indentation-depth tomelr--print-table-hierarchy))
@@ -230,26 +235,27 @@ Return nil if OBJECT cannot be encoded as a TOML string."
       ;;          tomelr--print-table-hierarchy)
       )
     (cond
-     ((equal type 'table)
+     ((equal type 'table-key)
       (princ (format "[%s]" (string-join tomelr--print-table-hierarchy "."))))
-     ((equal type 'table-array)
+     ((equal type 'table-array-key)
       (princ (format "[[%s]]" (string-join tomelr--print-table-hierarchy "."))))
      ((stringp object)
       ;; (message "[tomelr--print-stringlike DBG] %S is string" object)
-      (tomelr--print-string sym-name))
+      (tomelr--print-string sym-name type))
      ((keywordp object)
       ;; (message "[tomelr--print-stringlike DBG] %S is keyword" object)
       (tomelr--print-string sym-name 'keyword))
      (sym-name
       (princ sym-name)))))
 
-(defun tomelr--print-key (key &optional type)
+(defun tomelr--print-key (key &optional key-type)
   "Insert a TOML key representation of KEY at point.
 
-TYPE is set to `table' if KEY is a TOML Table key.
+KEY-TYPE represents the type of key: `normal-key', `table-key' or
+`table-array-key'.
 
 Signal `tomelr-key-format' if it cannot be encoded as a string."
-  (or (tomelr--print-stringlike key type)
+  (or (tomelr--print-stringlike key key-type)
       (signal 'tomelr-key-format (list key))))
 
 ;;;; Objects
@@ -283,18 +289,17 @@ Examples:
 
 (defun tomelr--print-pair (key val)
   "Insert TOML representation of KEY - VAL pair at point."
-  (let ((type (cond
-               ((tomelr--toml-table-p val) 'table)
-               ((tomelr--toml-table-array-p val) 'table-array)
-               (t nil))))
-    ;; (message "[tomelr--print-pair DBG] key = %S, val = %S, type = %S"
-    ;;          key val type)
+  (let ((key-type (cond
+                   ((tomelr--toml-table-p val) 'table-key)
+                   ((tomelr--toml-table-array-p val) 'table-array-key)
+                   (t 'normal-key))))
+    ;; (message "[tomelr--print-pair DBG] key = %S, val = %S, key-type = %S"
+    ;;          key val key-type)
     (when val                     ;Don't print the key if val is nil
       (tomelr--print-indentation) ;Newline before each key in a key-value pair
-      (tomelr--print-key key type)
-      ;; Skip putting the separator if `type' has a non-nil value like
-      ;; `table'.
-      (unless type
+      (tomelr--print-key key key-type)
+      ;; Skip putting the separator for table and table array keys.
+      (unless (member key-type '(table-key table-array-key))
         (insert tomelr--print-keyval-separator))
       (tomelr--print val))))
 
