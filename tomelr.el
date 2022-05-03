@@ -333,7 +333,7 @@ Signal `tomelr-key-format' if it cannot be encoded as a string."
   ;; (message "[tomelr-alist-p DBG] out 2 list = %S, is alist? %S" list (null list))
   (null list))
 
-(defun tomelr--toml-table-p (object)
+(defun tomelr-toml-table-p (object)
   "Return non-nil if OBJECT can represent a TOML Table.
 
 Recognize both alist and plist format maps as TOML Tables.
@@ -348,8 +348,8 @@ Examples:
 (defun tomelr--print-pair (key val)
   "Insert TOML representation of KEY - VAL pair at point."
   (let ((key-type (cond
-                   ((tomelr--toml-table-p val) 'table-key)
-                   ((tomelr--toml-table-array-p val) 'table-array-key)
+                   ((tomelr-toml-table-p val) 'table-key)
+                   ((tomelr-toml-table-array-p val) 'table-array-key)
                    (t 'normal-key))))
     ;; (message "[tomelr--print-pair DBG] key = %S, val = %S, key-type = %S"
     ;;          key val key-type)
@@ -372,14 +372,14 @@ This works for any MAP satisfying `mapp'."
 ;;;; Lists (including alists and plists)
 (defun tomelr--print-list (list)
   "Insert a TOML representation of LIST at point."
-  (cond ((tomelr--toml-table-p list)
+  (cond ((tomelr-toml-table-p list)
          (tomelr--print-map list))
         ((listp list)
          (tomelr--print-array list))
         ((signal 'tomelr-error (list list)))))
 
 ;;;; Arrays
-(defun tomelr--toml-table-array-p (object)
+(defun tomelr-toml-table-array-p (object)
   "Return non-nil if OBJECT can represent a TOML Table Array.
 
 Definition of a TOML Table Array (TTA):
@@ -389,7 +389,7 @@ Definition of a TOML Table Array (TTA):
   (when (or (listp object)
             (vectorp object))
     (seq-every-p
-     (lambda (elem) (tomelr--toml-table-p elem))
+     (lambda (elem) (tomelr-toml-table-p elem))
      object)))
 
 (defun tomelr--print-tta-key ()
@@ -408,9 +408,9 @@ Definition of a TOML Table Array (TTA):
 (defun tomelr--print-array (array)
   "Insert a TOML representation of ARRAY at point."
   ;; (message "[tomelr--print-array DBG] array = %S, TTA = %S"
-  ;;          array (tomelr--toml-table-array-p array))
+  ;;          array (tomelr-toml-table-array-p array))
   (cond
-   ((tomelr--toml-table-array-p array)
+   ((tomelr-toml-table-array-p array)
     (unless (= 0 (length array))
       (let ((first t))
         (mapc (lambda (elt)

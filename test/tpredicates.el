@@ -19,11 +19,12 @@
 
 ;;; Commentary:
 
-;; Tests for some internal functions.
+;; Tests for some tomelr predicate functions.
 
 ;;; Code:
 (require 'tomelr)
 
+;;;; tomelr-alist-p
 (ert-deftest test-internal-tomelr-alist-p-true ()
   (let ((inp '(
                ((a . 1))
@@ -54,7 +55,7 @@
     (dolist (el inp)
       (should (equal nil (tomelr-alist-p el))))))
 
-;;;; tomelr--toml-table-p
+;;;; tomelr-toml-table-p
 (ert-deftest test-internal-toml-table-true ()
   (let ((inp '(
                ((a . 1))
@@ -71,7 +72,7 @@
                       ((c . 300)))))
                )))
     (dolist (el inp)
-      (should (equal t (tomelr--toml-table-p el))))))
+      (should (equal t (tomelr-toml-table-p el))))))
 
 (ert-deftest test-internal-toml-table-false ()
   (let ((inp '(
@@ -81,9 +82,9 @@
                (((a . 1)))             ;This is an array of TOML table
                )))
     (dolist (el inp)
-      (should (equal nil (tomelr--toml-table-p el))))))
+      (should (equal nil (tomelr-toml-table-p el))))))
 
-;;;; tomelr--toml-table-array-p
+;;;; tomelr-toml-table-array-p
 (ert-deftest test-internal-tta-alist-true ()
   (let ((inp '(
                ;; TTA with 1 table of 1 key-val pair
@@ -95,7 +96,7 @@
                (((a . (((b . 2))))))
                )))
     (dolist (el inp)
-      (should (equal t (tomelr--toml-table-array-p el))))))
+      (should (equal t (tomelr-toml-table-array-p el))))))
 
 (ert-deftest test-internal-tta-plist-vector-notation-true ()
   (let ((inp '(
@@ -106,7 +107,7 @@
                 (:a 200 :b "bar")]
                )))
     (dolist (el inp)
-      (should (equal t (tomelr--toml-table-array-p el))))))
+      (should (equal t (tomelr-toml-table-array-p el))))))
 
 (ert-deftest test-internal-tta-plist-list-notation-true ()
   (let ((inp '(
@@ -117,14 +118,14 @@
                 (:a 100 :b 200))
                )))
     (dolist (el inp)
-      (should (equal t (tomelr--toml-table-array-p el))))))
+      (should (equal t (tomelr-toml-table-array-p el))))))
 
 (ert-deftest test-internal-tta-false ()
   (let ((inp '(
                ((a . 1))               ;This is a TOML table
                )))
     (dolist (el inp)
-      (should (equal nil (tomelr--toml-table-array-p el))))))
+      (should (equal nil (tomelr-toml-table-array-p el))))))
 
 
-(provide 'tinternal)
+(provide 'tpredicates)
