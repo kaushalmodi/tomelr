@@ -30,10 +30,12 @@
         (inp '(
                ((key1 . "true"))
                ((key2 . "false"))
+               ((key3 . (false true)))
                ))
         (ref '(
                "key1 = true"
                "key2 = false"
+               "key3 = [false, true]"
                ))
         out)
     (dolist (el inp)
@@ -45,10 +47,12 @@
         (inp '(
                ((key1 . "true"))
                ((key2 . "false"))
+               ((key3 . (false true)))
                ))
         (ref '(
                "key1 = \"true\""
                "key2 = \"false\""
+               "key3 = [\"false\", \"true\"]"
                ))
         out)
     (dolist (el inp)

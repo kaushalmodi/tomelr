@@ -129,12 +129,12 @@ Return nil if OBJECT is not recognized as a TOML boolean."
   (prog1 (setq object (cond ((or
                               (eq object t)
                               (and (member 'boolean tomelr-coerce-to-types)
-                                   (equal object "true")))
+                                   (member object '("true" true))))
                              "true")
                             ((or
                               (member object tomelr-false)
                               (and (member 'boolean tomelr-coerce-to-types)
-                                   (equal object "false")))
+                                   (member object '("false" false))))
                              "false")))
     (and object (insert object))))
 
