@@ -84,7 +84,6 @@
                ((string3 . "\"Hello!\"")) ;Quote in string
                ((string4 . "Line 1\n\nLine 3\n\n  Line 5 with 2 space indentation\n\nLine 7")) ;Blank lines in string
                ((audio . "audio path with space.mp3")) ;String with non-alphameric chars like space and period
-               ((version . 1.10.1))
                ))
         (ref '(
                "string1 = \"Roses are red\""
@@ -102,7 +101,6 @@ Line 3
 
 Line 7\"\"\""
                "audio = \"audio path with space.mp3\""
-               "version = \"1.10.1\""
                ))
         out)
     (dolist (el inp)
@@ -128,6 +126,20 @@ Line 7\"\"\""
                "odt2 = 1979-05-27 07:32:00Z"
                "odt3 = 1979-05-27T00:32:00-07:00"
                "odt4 = 1979-05-27T00:32:00.999999+04:00"))
+        out)
+    (dolist (el inp)
+      (push (tomelr-encode el) out))
+    (should (equal ref (nreverse out)))))
+
+(ert-deftest test-scalar-auto-quote ()
+  (let ((inp '(
+               ((key . 1.10.1))
+               ((key . foo))
+               ))
+        (ref '(
+               "key = \"1.10.1\""
+               "key = \"foo\""
+               ))
         out)
     (dolist (el inp)
       (push (tomelr-encode el) out))
