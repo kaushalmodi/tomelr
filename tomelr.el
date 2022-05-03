@@ -51,6 +51,16 @@ For example, if this list contains `boolean' and if a string
 value is exactly \"true\", it will coerce to TOML boolean
 `true'.")
 
+(defvar tomelr-indent-multi-line-strings nil
+  "Indent the multi-line TOML strings when non-nil.
+
+This option injects spaces after each newline to present the
+multi-line strings in a more readable format.
+
+*Note: This option should be set to non-nil only if the TOML
+string data is insensitive to horizontal space.  Good examples of
+this would be Org, Markdown or HTML strings.")
+
 ;;;; Internal Variables
 (defvar tomelr--print-indentation-prefix "\n"
   "String used to start indentation during encoding.")
@@ -148,12 +158,13 @@ Return the same STRING passed as input."
                          (?f . ?\f)     ;U+000C
                          (?\\ . ?\\)))
         (special-chars-re (rx (in ?\" ?\\ cntrl ?\u007F))) ;cntrl is same as (?\u0000 . ?\u001F)
+        ;; Use multi-line string quotation if the string contains a "
+        ;; char or a newline - """STRING""".
+        (multi-line (string-match-p "\n\\|\"" string))
         begin-q end-q)
 
     (cond
-     ;; Use multi-line string quotation if the string contains a "
-     ;; char or a newline - """STRING""".
-     ((string-match-p "\n\\|\"" string)
+     (multi-line
       ;; From https://toml.io/en/v1.0.0#string, Any Unicode
       ;; character may be used except those that must be escaped:
       ;; backslash and the control characters other than tab, line
@@ -164,8 +175,23 @@ Return the same STRING passed as input."
                                      ?\u000B ?\u000C
                                      (?\u000E . ?\u001F)
                                      ?\u007F)))
+
       (setq begin-q "\"\"\"\n")
-      (setq end-q "\"\"\""))
+      (setq end-q "\"\"\"")
+      (when tomelr-indent-multi-line-strings
+        (let ((indentation (let ((tmp ""))
+                             (dotimes (_ (1+ tomelr--print-indentation-depth))
+                               (setq tmp (concat tmp tomelr-encoding-default-indentation)))
+                             tmp)))
+          (setq string
+                (concat
+                 indentation ;Indent the first line in the multi-line string
+                 (replace-regexp-in-string
+                  "\\(\n\\)\\([^\n]\\)"  ;Don't indent blank lines
+                  (format "\\1%s\\2" indentation)
+                  string)
+                 "\n" indentation ;Indent the closing """ at the end of the multi-line string
+                 )))))
      (t                                 ;Basic quotation "STRING"
       (push '(?\" . ?\") special-chars)
       (push '(?t . ?\t) special-chars) ;U+0009

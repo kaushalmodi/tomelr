@@ -26,6 +26,7 @@
 
 (require 'tkey)
 (require 'tscalar)
+(require 'tstring)
 (require 'tnil)
 (require 'tarray)
 (require 'ttable)
