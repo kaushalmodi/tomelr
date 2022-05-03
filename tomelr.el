@@ -187,17 +187,6 @@ Return the same STRING passed as input."
     (and end-q (insert end-q))
     string))
 
-(defun tomelr--quote-string-maybe (str)
-  "Return STR wrapped in quotes if it's not already."
-  (let ((quoted-str (or str "")))
-    (unless (or ;; RFC 3339 formatted date-time with offset.
-             (string-match-p tomelr--date-time-regexp str)
-             ;; str is already wrapped with quotes.
-             (and (string= (substring str 0 1) "\"")
-                  (string= (substring str -1) "\"")))
-      (setq quoted-str (format "\"%s\"" quoted-str)))
-    quoted-str))
-
 (defun tomelr--print-stringlike (object &optional key-type)
   "Insert OBJECT encoded as a TOML string at point.
 
@@ -230,10 +219,10 @@ Return nil if OBJECT cannot be encoded as a TOML string."
 
               ;; Cases where object is a key value.
               ((symbolp object)
-               (tomelr--quote-string-maybe (symbol-name object)))
+               (symbol-name object))
               ((stringp object)
                object))))
-
+    ;; (message "[tomelr--print-stringlike DBG] str = %S" str)
     (when (member key-type '(table-key table-array-key))
       ;; (message "[tomelr--print-stringlike DBG] %S is symbol, type = %S, depth = %d"
       ;;          object type tomelr--print-indentation-depth)
@@ -261,29 +250,34 @@ Return nil if OBJECT cannot be encoded as a TOML string."
      ;; Normal keys (Alist and Plist keys)
      ((equal key-type 'normal-key)
       (princ str))
-     ;; Date/Time
-     ((and (stringp object)
-           (string-match-p tomelr--date-time-regexp object))
-      (princ object))
+     ;; Coercing
+     ((and (stringp str)
+           (or
+            ;; RFC 3339 Date/Time
+            (string-match-p tomelr--date-time-regexp str)
+
+            ;; Integer that can be stored in the system as a fixnum.
+            ;; For example, if `object' is "10040216507682529280" that
+            ;; needs more than 64 bits to be stored as a signed
+            ;; integer, it will be automatically stored as a float.
+            ;; So (integerp (string-to-number object)) will return nil
+            ;; [or `fixnump' instead of `integerp' in Emacs 27 or
+            ;; newer].
+            ;; https://github.com/toml-lang/toml#integer
+            ;; Integer examples: 7, +7, -7, 7_000
+            (and (or (symbolp object)
+                     (member 'integer tomelr-coerce-to-types))
+                 (string-match-p "\\`[+-]?[[:digit:]_]+\\'" str)
+                 (if (functionp #'fixnump) ;`fixnump' and `bignump' get introduced in Emacs 27.x
+                     (fixnump (string-to-number str))
+                   ;; On older Emacsen, `integerp' behaved the same as the
+                   ;; new `fixnump'.
+                   (integerp (string-to-number str))))))
+      (princ str))
+     ((symbolp object)
+      (princ (format "%S" str)))
      ((stringp object)
-      (cond
-       ;; If it an integer that can be stored in the system as a
-       ;; fixnum.  For example, if `object' is "10040216507682529280"
-       ;; that needs more than 64 bits to be stored as a signed
-       ;; integer, it will be automatically stored as a float.  So
-       ;; (integerp (string-to-number object)) will return nil [or
-       ;; `fixnump' instead of `integerp' in Emacs 27 or newer]
-       ;; https://github.com/toml-lang/toml#integer
-       ;; Integer examples: 7, +7, -7, 7_000
-       ((and (member 'integer tomelr-coerce-to-types)
-             (string-match-p "\\`[+-]?[[:digit:]_]+\\'" object)
-             (if (functionp #'fixnump) ;`fixnump' and `bignump' get introduced in Emacs 27.x
-                 (fixnump (string-to-number object))
-               (integerp (string-to-number object)))) ;On older Emacsen, `integerp' behaved the same as the new `fixnump'
-        (princ object))
-       (t
-        ;; (message "[tomelr--print-stringlike DBG] %S is string" object)
-        (tomelr--print-string str))))
+      (tomelr--print-string str))
      (str
       (princ str)))))
 
