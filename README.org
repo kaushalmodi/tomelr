@@ -5,17 +5,18 @@
 
 #+property: header-args :eval never-export
 
-[[https://github.com/kaushalmodi/tomelr/actions][https://github.com/kaushalmodi/tomelr/actions/workflows/test.yml/badge.svg]] [[https://www.gnu.org/licenses/gpl-3.0][https://img.shields.io/badge/License-GPL%20v3-blue.svg]]
+[[https://github.com/kaushalmodi/tomelr/actions][https://github.com/kaushalmodi/tomelr/actions/workflows/test.yml/badge.svg]] [[https://elpa.gnu.org/packages/tomelr.html][https://elpa.gnu.org/packages/tomelr.svg]] [[https://www.gnu.org/licenses/gpl-3.0][https://img.shields.io/badge/License-GPL%20v3-blue.svg]]
 
 * Installation
-Clone this repo, have ~tomelr.el~ in the ~load-path~ and ~(require
-'tomelr)~.
-* Credit
-This library started off by extracting the JSON Encoding pieces from
-the Emacs core library [[https://git.savannah.gnu.org/cgit/emacs.git/tree/lisp/json.el][*json.el*]].
+~M-x~ ~package-install~ ~RET~ ~tomelr~ ~RET~
 
-It was then refactored to meet the specification defined below.
-* API
+/or/
+
+#+begin_src emacs-lisp
+(use-package tomelr
+  :ensure t)
+#+end_src
+* Usage
 This library has only one entry point for simplicity: ~tomelr-encode~.
 
 - Input :: Lisp data expression in Alist or Plist format
@@ -118,12 +119,12 @@ See [org#Drawers](https://www.gnu.org/software/emacs/manual/html_mono/org.html#D
   timestamp = 2018-09-06T11:37:00-04:00
   note = "A note `mono`."
 #+end_src
-* Limitation
+* Limitations
 Right now, the scalars and tables/array of tables does not get ordered
 in the right order automatically. So the user needs to ensure that the
 S-exp has all the scalars in the very beginning and then followed by
 TOML tables and arrays of tables.
-** Correct Example
+** Correct Use Example
 ​:white_check_mark: Put the scalars first and then maps or tables.
 #+begin_src emacs-lisp :eval no :noweb-ref scalar-tables-order-correct
 '((title . "Hello")           ;First the scalar
@@ -142,7 +143,7 @@ title = "Hello"
   file = "foo.png"
   credit = "Bar Zoo"
 #+end_src
-** Wrong Example
+** Incorrect Use Example
 ​:x: *Don't do this!*: Map or table first and then scalar.
 #+begin_src emacs-lisp :eval no :noweb-ref scalar-tables-order-wrong
 '((img . ((file . "foo.png")
@@ -1221,6 +1222,11 @@ the name matches "scalar" completely or partially, run:
 #+begin_src shell
 make test MATCH=scalar
 #+end_src
+* Credit
+This library started off by extracting the JSON Encoding pieces from
+the Emacs core library [[https://git.savannah.gnu.org/cgit/emacs.git/tree/lisp/json.el][*json.el*]].
+
+It was then refactored to meet the specification defined below.
 * COMMENT Helper function
 ** JSON Reference pretty print string
 The ~json-encode-pretty~ function defined here is used to pretty-print
