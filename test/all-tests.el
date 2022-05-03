@@ -1,5 +1,7 @@
 ;;; all-tests.el --- Tests for tomelr.el                   -*- lexical-binding: t; -*-
 
+;; Copyright (C) 2022 Free Software Foundation, Inc.
+
 ;; Authors: Kaushal Modi <kaushal.modi@gmail.com>
 
 ;; This file is not part of GNU Emacs.

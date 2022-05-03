@@ -1,10 +1,12 @@
 ;;; tomelr.el --- Convert s-expressions to TOML           -*- lexical-binding: t -*-
 
+;; Copyright (C) 2022 Free Software Foundation, Inc.
+
 ;; Authors: Kaushal Modi <kaushal.modi@gmail.com>
 ;; URL: https://github.com/kaushalmodi/tomelr
 ;; Package-Requires: ((emacs "26.3"))
 ;; Keywords: data, tools
-;; Version: 0.1.0
+;; Version: 0.2.1
 
 ;; This file is not part of GNU Emacs.
 
