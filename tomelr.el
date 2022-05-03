@@ -147,12 +147,12 @@ Return the same STRING passed as input."
   (let ((special-chars '((?b . ?\b)     ;U+0008
                          (?f . ?\f)     ;U+000C
                          (?\\ . ?\\)))
-        (special-chars-re (rx (in cntrl ?\u007F)))
+        (special-chars-re (rx (in ?\" ?\\ cntrl ?\u007F))) ;cntrl is same as (?\u0000 . ?\u001F)
         begin-q end-q)
+
     (cond
      ;; Use multi-line string quotation if the string contains a "
-     ;; char or a newline - """STRING""", and only if the string
-     ;; doesn't have a "key type".
+     ;; char or a newline - """STRING""".
      ((string-match-p "\n\\|\"" string)
       ;; From https://toml.io/en/v1.0.0#string, Any Unicode
       ;; character may be used except those that must be escaped:
@@ -167,13 +167,13 @@ Return the same STRING passed as input."
       (setq begin-q "\"\"\"\n")
       (setq end-q "\"\"\""))
      (t                                 ;Basic quotation "STRING"
-      (setq special-chars-re (rx (in ?\" ?\\ cntrl ?\u007F))) ;cntrl is same as (?\u0000 . ?\u001F)
       (push '(?\" . ?\") special-chars)
       (push '(?t . ?\t) special-chars) ;U+0009
       (push '(?n . ?\n) special-chars) ;U+000A
       (push '(?r . ?\r) special-chars) ;U+000D
       (setq begin-q "\"")
       (setq end-q begin-q)))
+
     (and begin-q (insert begin-q))
     (goto-char (prog1 (point) (princ string)))
     (while (re-search-forward special-chars-re nil :noerror)
@@ -250,36 +250,35 @@ Return nil if OBJECT cannot be encoded as a TOML string."
      ;; Normal keys (Alist and Plist keys)
      ((equal key-type 'normal-key)
       (princ str))
-     ;; Coercing
-     ((and (stringp str)
-           (or
-            ;; RFC 3339 Date/Time
-            (string-match-p tomelr--date-time-regexp str)
-
-            ;; Integer that can be stored in the system as a fixnum.
-            ;; For example, if `object' is "10040216507682529280" that
-            ;; needs more than 64 bits to be stored as a signed
-            ;; integer, it will be automatically stored as a float.
-            ;; So (integerp (string-to-number object)) will return nil
-            ;; [or `fixnump' instead of `integerp' in Emacs 27 or
-            ;; newer].
-            ;; https://github.com/toml-lang/toml#integer
-            ;; Integer examples: 7, +7, -7, 7_000
-            (and (or (symbolp object)
-                     (member 'integer tomelr-coerce-to-types))
-                 (string-match-p "\\`[+-]?[[:digit:]_]+\\'" str)
-                 (if (functionp #'fixnump) ;`fixnump' and `bignump' get introduced in Emacs 27.x
-                     (fixnump (string-to-number str))
-                   ;; On older Emacsen, `integerp' behaved the same as the
-                   ;; new `fixnump'.
-                   (integerp (string-to-number str))))))
-      (princ str))
-     ((symbolp object)
-      (princ (format "%S" str)))
-     ((stringp object)
-      (tomelr--print-string str))
      (str
-      (princ str)))))
+      (cond
+       ((or
+         ;; RFC 3339 Date/Time
+         (string-match-p tomelr--date-time-regexp str)
+
+         ;; Coercing
+         ;; Integer that can be stored in the system as a fixnum.
+         ;; For example, if `object' is "10040216507682529280" that
+         ;; needs more than 64 bits to be stored as a signed
+         ;; integer, it will be automatically stored as a float.
+         ;; So (integerp (string-to-number object)) will return nil
+         ;; [or `fixnump' instead of `integerp' in Emacs 27 or
+         ;; newer].
+         ;; https://github.com/toml-lang/toml#integer
+         ;; Integer examples: 7, +7, -7, 7_000
+         (and (or (symbolp object)
+                  (member 'integer tomelr-coerce-to-types))
+              (string-match-p "\\`[+-]?[[:digit:]_]+\\'" str)
+              (if (functionp #'fixnump) ;`fixnump' and `bignump' get introduced in Emacs 27.x
+                  (fixnump (string-to-number str))
+                ;; On older Emacsen, `integerp' behaved the same as the
+                ;; new `fixnump'.
+                (integerp (string-to-number str)))))
+        (princ str))
+       (t
+        (tomelr--print-string str))))
+     (t
+      nil))))
 
 (defun tomelr--print-key (key &optional key-type)
   "Insert a TOML key representation of KEY at point.
