@@ -4,6 +4,24 @@
 
 All notable changes to this project will be documented in this file.
 
+** *0.2.0* - <2022-05-03>
+
+[[https://github.com/kaushalmodi/tomelr/compare/568de5efb250c0bb4f19495c69b8b42b41fb186d...b4be72f240038d2db27540effcdd63e649b4df57][568de5e...b4be72f]]
+
+*** :sparkles: Features
+:PROPERTIES:
+:CUSTOM_ID: features-v0.2.0
+:END:
+
+- Add option for indenting multi-line strings … New defvar `tomelr-indent-multi-line-strings`. ([[https://github.com/kaushalmodi/tomelr/commit/3362213172237f40ff0d9aa3ddf12b4bb00a3564][3362213]])
+
+*** :recycle: Refactor
+:PROPERTIES:
+:CUSTOM_ID: refactor-v0.2.0
+:END:
+
+- Rename tomelr predicate functions for consistency ([[https://github.com/kaushalmodi/tomelr/commit/b4be72f240038d2db27540effcdd63e649b4df57][b4be72f]])
+
 ** *0.1.0* - <2022-05-03>
 
 [[https://github.com/kaushalmodi/tomelr/compare/4434ccc64b1e311b53e8ecc906113bba2e16fa98...568de5efb250c0bb4f19495c69b8b42b41fb186d][4434ccc...568de5e]]
