@@ -21,7 +21,43 @@
 
 ;;; Code:
 
+(defun tomelr-install ()
+  "Test installation of `tomelr' including all its dependencies."
+  (let ((tomelr-site-git-root (progn
+                                (require 'vc-git)
+                                (file-truename (vc-git-root default-directory)))))
+
+    (setq package-user-dir (let ((elpa-dir-name (format "elpa_%s" emacs-major-version))) ;default = "elpa"
+                             (file-name-as-directory (expand-file-name elpa-dir-name user-emacs-directory))))
+
+    ;; Below require will auto-create `package-user-dir' it doesn't exist.
+    (require 'package)
+
+    ;; Load emacs packages and activate them.
+    ;; Don't delete this line.
+    (package-initialize)                  ;
+    ;; `package-initialize' call is required before any of the below
+    ;; can happen.
+
+    (message "Emacs is now refreshing its package database...")
+    (package-refresh-contents)
+
+    (package-install-file (expand-file-name "tomelr.el" tomelr-site-git-root))
+    ;; (message "package-user-dir: %S" package-user-dir)
+    ;; (message "load-path: %S" load-path)
+    ))
+
+;; Load newer version of .el and .elc if both are available
 (setq load-prefer-newer t)
+
+;; Install map and seq from GNU ELPA only for Emacsen older than 27.x.
+(when (version< emacs-version "27.0")
+  ;; Workaround for this error on GHA when using Emacs 26.3:
+  ;;   signal(file-error ("https://elpa.gnu.org/packages/tomelr-0.2.2.tar" "Bad Request"))
+  ;; https://lists.gnu.org/archive/html/help-gnu-emacs/2020-01/msg00162.html
+  (setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3"))
+
+(tomelr-install)
 
 (require 'tjson-utils)
 
