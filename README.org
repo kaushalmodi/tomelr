@@ -8,21 +8,31 @@
 [[https://github.com/kaushalmodi/tomelr/actions][https://github.com/kaushalmodi/tomelr/actions/workflows/test.yml/badge.svg]] [[https://elpa.gnu.org/packages/tomelr.html][https://elpa.gnu.org/packages/tomelr.svg]] [[https://www.gnu.org/licenses/gpl-3.0][https://img.shields.io/badge/License-GPL%20v3-blue.svg]]
 
 * Installation
-~M-x~ ~package-install~ ~RET~ ~tomelr~ ~RET~
+~tomelr~ is a library that will typically be auto-installed via
+another package requiring it.
 
-/or/
+If you are developing a package and want to use this library, you can
+install it locally using Emacs ~package.el~ as follows as it's
+available via GNU ELPA:
 
-#+begin_src emacs-lisp
-(use-package tomelr
-  :ensure t)
-#+end_src
-* Usage
-This library has only one entry point for simplicity: ~tomelr-encode~.
-
-- Input :: Lisp data expression in Alist or Plist format
-- Output :: TOML string
+*M-x* ~package-install~ *RET* ~tomelr~ *RET*
+* How to develop using this library
+1. Add this library in the /Package-Requires/ header. Here's an
+   example from [[https://ox-hugo.scripter.co][~ox-hugo~]]:
+   #+begin_src emacs-lisp
+   ;; Package-Requires: ((emacs "24.4") (org "9.0") tomelr))
+   #+end_src
+2. Require it.
+   #+begin_src emacs-lisp
+   (require 'tomelr)
+   #+end_src
+3. Use the ~tomelr-encode~ function.
+   - Input :: Lisp data expression in Alist or Plist format
+   - Output :: TOML string
 ** Example
 *** Alist data
+Here's an example of input *alist* that can be processed by
+~tomelr-encode~.
 #+begin_src emacs-lisp :eval no :noweb-ref data-example-alist
 '((title . "Some Title") ;String
   (author . ("fn ln"))   ;List
@@ -71,6 +81,8 @@ See [org#Drawers](https://www.gnu.org/software/emacs/manual/html_mono/org.html#D
   note = "A note `mono`."
 #+end_src
 *** Plist data
+Here's an example of input *plist* that can be processed by
+~tomelr-encode~.
 #+begin_src emacs-lisp :eval no :noweb-ref data-example-plist
 '(:title "Some Title" ;String
   :author ("fn ln")   ;List
@@ -87,7 +99,7 @@ See [org#Drawers](https://www.gnu.org/software/emacs/manual/html_mono/org.html#D
                  :note "A note `mono`.")))
 #+end_src
 *** TOML Output
-You will get the below TOML output for either of the above input data.
+You will get the below TOML output for either of the above input data:
 #+begin_src emacs-lisp :noweb yes :exports results :wrap src toml
 (tomelr-encode
   <<data-example-plist>>)
@@ -168,26 +180,8 @@ title = "Hello"
 * Specification and Conversion Examples
 [[https://scripter.co/defining-tomelr/][Companion blog post]]
 
-Below examples are shown on how S-expressions get translated to
-various TOML object types.
-** Library Completion Status [7/7]
-- [X] Scalar
-  - [X] Boolean
-  - [X] Integer
-  - [X] Float
-  - [X] String
-  - [X] Date
-  - [X] Date + Time with Offset
-- [X] Nil
-- [X] Arrays
-- [X] Array of Arrays
-- [X] Tables
-  - [X] Basic Tables
-  - [X] Nested Tables
-- [X] Array of Tables
-  - [X] Basic Array of Tables
-  - [X] Nested Array of Tables
-- [X] Property Lists
+Following examples shown how S-expressions get translated to various
+TOML object types.
 ** Scalars
 *** DONE Boolean
 CLOSED: [2022-04-28 Thu 16:48]
