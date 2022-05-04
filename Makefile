@@ -10,7 +10,7 @@ MATCH ?=
 .PHONY: test changelog
 
 test:
-	$(EMACS) --batch -L . -L $(TEST_DIR) -l all-tests.el -eval '(ert-run-tests-batch-and-exit "$(MATCH)")'
+	@env HOME=$(shell pwd)/test $(EMACS) --batch -L $(TEST_DIR) -l all-tests.el -eval '(ert-run-tests-batch-and-exit "$(MATCH)")'
 
 # Requires https://github.com/orhun/git-cliff to be installed.
 changelog:
