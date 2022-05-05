@@ -4,6 +4,28 @@
 
 All notable changes to this project will be documented in this file.
 
+** *0.3.0* - <2022-05-05>
+
+[[https://github.com/kaushalmodi/tomelr/compare/8fc2257ec072a3fc3316c7f311722db50b37558e...2820bf1af3e5482df8aa1c9c35bd0d7333ce6a68][8fc2257...2820bf1]]
+
+*** :bug: Bug Fixes
+:PROPERTIES:
+:CUSTOM_ID: bug-fixes-v0.3.0
+:END:
+
+- Make plist parsing work on emacs 26.3 … The fix was to make tomelr depend on the newer map v3.2.1 and seq … v2.23 versions from GNU ELPA. ([[https://github.com/kaushalmodi/tomelr/commit/2820bf1af3e5482df8aa1c9c35bd0d7333ce6a68][2820bf1]])
+
+** *0.2.3* - <2022-05-03>
+
+[[https://github.com/kaushalmodi/tomelr/compare/4e2edfe073d2a057a37b159d4e67282aa132f596...884674e168cbef35275a325f707c588ac2b5c866][4e2edfe...884674e]]
+
+*** :memo: Documentation
+:PROPERTIES:
+:CUSTOM_ID: documentation-v0.2.3
+:END:
+
+- Add installation instructions now that this is in GNU ELPA ([[https://github.com/kaushalmodi/tomelr/commit/9aa308665daa507655285d601d3e13657cb4523e][9aa3086]])
+
 ** *0.2.0* - <2022-05-03>
 
 [[https://github.com/kaushalmodi/tomelr/compare/568de5efb250c0bb4f19495c69b8b42b41fb186d...b4be72f240038d2db27540effcdd63e649b4df57][568de5e...b4be72f]]
