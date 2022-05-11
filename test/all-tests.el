@@ -50,13 +50,6 @@
 ;; Load newer version of .el and .elc if both are available
 (setq load-prefer-newer t)
 
-;; Install map and seq from GNU ELPA only for Emacsen older than 27.x.
-(when (version< emacs-version "27.0")
-  ;; Workaround for this error on GHA when using Emacs 26.3:
-  ;;   signal(file-error ("https://elpa.gnu.org/packages/tomelr-0.2.2.tar" "Bad Request"))
-  ;; https://lists.gnu.org/archive/html/help-gnu-emacs/2020-01/msg00162.html
-  (setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3"))
-
 (tomelr-install)
 
 (require 'tjson-utils)
