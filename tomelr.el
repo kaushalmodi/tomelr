@@ -281,28 +281,26 @@ Return nil if OBJECT cannot be encoded as a TOML string."
     ;; (message "[tomelr--print-stringlike DBG] str = %S" str)
     (when (member key-type '(table-key table-array-key))
       ;; (message "[tomelr--print-stringlike DBG] %S is symbol, type = %S, depth = %d"
-      ;;          object type tomelr--print-indentation-depth)
+      ;;          object key-type tomelr--print-indentation-depth)
       (if (null (nth tomelr--print-indentation-depth tomelr--print-table-hierarchy))
           (progn
-            (push str tomelr--print-table-hierarchy)
-            (setq tomelr--print-table-hierarchy (nreverse tomelr--print-table-hierarchy)))
+            (push str tomelr--print-table-hierarchy))
+
         ;; Throw away table keys collected at higher depths, if
         ;; any, from earlier runs of this function.
         (setq tomelr--print-table-hierarchy
-              (seq-take tomelr--print-table-hierarchy
-                        (1+ tomelr--print-indentation-depth)))
-        (setf (nth tomelr--print-indentation-depth tomelr--print-table-hierarchy)
-              str))
-      ;; (message "[tomelr--print-stringlike DBG] table hier: %S"
-      ;;          tomelr--print-table-hierarchy)
+              (reverse (seq-take (reverse tomelr--print-table-hierarchy)
+                                 (1+ tomelr--print-indentation-depth))))
+        (setf (nth 0 tomelr--print-table-hierarchy) str))
+      ;; (message "[tomelr--print-stringlike DBG] table hier: %S" tomelr--print-table-hierarchy)
       )
     (cond
      ;; TT keys
      ((equal key-type 'table-key)
-      (princ (format "[%s]" (string-join tomelr--print-table-hierarchy "."))))
+      (princ (format "[%s]" (string-join (reverse tomelr--print-table-hierarchy) "."))))
      ;; TTA keys
      ((equal key-type 'table-array-key)
-      (princ (format "[[%s]]" (string-join tomelr--print-table-hierarchy "."))))
+      (princ (format "[[%s]]" (string-join (reverse tomelr--print-table-hierarchy) "."))))
      ;; Normal keys (Alist and Plist keys)
      ((equal key-type 'normal-key)
       (princ str))
@@ -428,12 +426,11 @@ Definition of a TOML Table Array (TTA):
   ;; Throw away table keys collected at higher depths, if
   ;; any, from earlier runs of this function.
   (setq tomelr--print-table-hierarchy
-        (seq-take tomelr--print-table-hierarchy
-                  (1+ tomelr--print-indentation-depth)))
-
+        (reverse (seq-take (reverse tomelr--print-table-hierarchy)
+                           (1+ tomelr--print-indentation-depth))))
   (tomelr--print-indentation)
   (insert
-   (format "[[%s]]" (string-join tomelr--print-table-hierarchy "."))))
+   (format "[[%s]]" (string-join (reverse tomelr--print-table-hierarchy) "."))))
 
 (defun tomelr--print-array (array)
   "Insert a TOML representation of ARRAY at point."
@@ -480,6 +477,7 @@ See `tomelr-encode' that returns the same as a string."
   "Return a TOML representation of OBJECT as a string.
 If an error is detected during encoding, an error based on
 `tomelr-error' is signaled."
+  (setq tomelr--print-table-hierarchy ())
   (string-trim
    (tomelr--with-output-to-string (tomelr--print object))))
 

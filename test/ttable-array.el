@@ -127,5 +127,46 @@ See [org#Drawers](https://www.gnu.org/software/emacs/manual/html_mono/org.html#D
       (push (tomelr-encode el) out))
     (should (equal ref (nreverse out)))))
 
+;;;; TOML Table Array in a deeply nested sub-table
+(ert-deftest test-tta-in-subtable ()
+  (let ((inp '(
+               ((logbook . ((toplevel . ((notes . (((note . "abc")
+                                                    (val . 123))
+                                                   ((note . "def")
+                                                    (val . 456))
+                                                   ((note . "ghi")
+                                                    (val . 789))
+                                                   ))))
+                            (sub1 . ((notes . (((note . "subabc")
+                                                (val . 99123))
+                                               ((note . "subdef")
+                                                (val . 99456))
+                                               )))))))
+               ))
+        (ref '(
+               "[logbook]
+  [logbook.toplevel]
+    [[logbook.toplevel.notes]]
+      note = \"abc\"
+      val = 123
+    [[logbook.toplevel.notes]]
+      note = \"def\"
+      val = 456
+    [[logbook.toplevel.notes]]
+      note = \"ghi\"
+      val = 789
+  [logbook.sub1]
+    [[logbook.sub1.notes]]
+      note = \"subabc\"
+      val = 99123
+    [[logbook.sub1.notes]]
+      note = \"subdef\"
+      val = 99456"
+               ))
+        out)
+    (dolist (el inp)
+      (push (tomelr-encode el) out))
+    (should (equal ref (nreverse out)))))
+
 
 (provide 'ttable-array)
