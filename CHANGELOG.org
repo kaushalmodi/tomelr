@@ -4,6 +4,17 @@
 
 All notable changes to this project will be documented in this file.
 
+** *0.4.0* - <2022-05-11>
+
+[[https://github.com/kaushalmodi/tomelr/compare/2820bf1af3e5482df8aa1c9c35bd0d7333ce6a68...a5b2a0e6251ce62cd2ce515b961dba513966fcb9][2820bf1...a5b2a0e]]
+
+*** :bug: Bug Fixes
+:PROPERTIES:
+:CUSTOM_ID: bug-fixes-v0.4.0
+:END:
+
+- Case of table arrays in nested sub tables ([[https://github.com/kaushalmodi/tomelr/commit/0f7a6cf7f40717b3fd7735f3ee78978e2d031bdb][0f7a6cf]])
+
 ** *0.3.0* - <2022-05-05>
 
 [[https://github.com/kaushalmodi/tomelr/compare/8fc2257ec072a3fc3316c7f311722db50b37558e...2820bf1af3e5482df8aa1c9c35bd0d7333ce6a68][8fc2257...2820bf1]]
