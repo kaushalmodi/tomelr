@@ -4,6 +4,24 @@
 
 All notable changes to this project will be documented in this file.
 
+** *0.4.2* - <2022-05-11>
+
+[[https://github.com/kaushalmodi/tomelr/compare/19d128f0d2fd4ea8d4bf92cb1f5a235468b45d00...e45b0e43e80cc9df796027674a412708050ec8d6][19d128f...e45b0e4]]
+
+*** :bug: Bug Fixes
+:PROPERTIES:
+:CUSTOM_ID: bug-fixes-v0.4.2
+:END:
+
+- Don't allow multi-line strings to indent by more than 2 spaces … The `tomelr-indent-multi-line-strings` variable is set to `t' mainly … by ox-hugo. So these multi-line strings will most likely be pars… ([[https://github.com/kaushalmodi/tomelr/commit/e45b0e43e80cc9df796027674a412708050ec8d6][e45b0e4]])
+
+*** :recycle: Refactor
+:PROPERTIES:
+:CUSTOM_ID: refactor-v0.4.2
+:END:
+
+- Use append instead of push+​​reverse ([[https://github.com/kaushalmodi/tomelr/commit/7f331a8c0d4ab1f25b6f8b8749f8cb7a6ad274a6][7f331a8]])
+
 ** *0.4.0* - <2022-05-11>
 
 [[https://github.com/kaushalmodi/tomelr/compare/2820bf1af3e5482df8aa1c9c35bd0d7333ce6a68...a5b2a0e6251ce62cd2ce515b961dba513966fcb9][2820bf1...a5b2a0e]]
