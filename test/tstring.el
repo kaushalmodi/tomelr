@@ -75,35 +75,35 @@ xyz\"\"\""
   \"\"\""
                "[table]
   key = \"\"\"
-    abc
-    def
-    \"\"\""
+  abc
+  def
+  \"\"\""
                "[[table_array]]
   key = \"\"\"
-    abc
-    def
-    \"\"\"
+  abc
+  def
+  \"\"\"
 [[table_array]]
   key = \"\"\"
-    klm
-    xyz
-    \"\"\""
+  klm
+  xyz
+  \"\"\""
                "[[table_array]]
   key = \"\"\"
-    abc
+  abc
 
-    def
-    \"\"\""
+  def
+  \"\"\""
                "[[table_array]]
   key = \"\"\"
-    abc
+  abc
 
 
-    def
+  def
 
-    foo
-    bar
-    \"\"\""
+  foo
+  bar
+  \"\"\""
                ))
         out)
     (dolist (el inp)

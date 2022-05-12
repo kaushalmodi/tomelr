@@ -209,10 +209,11 @@ Return the same STRING passed as input."
       (setq begin-q "\"\"\"\n")
       (setq end-q "\"\"\"")
       (when tomelr-indent-multi-line-strings
-        (let ((indentation (let ((tmp ""))
-                             (dotimes (_ (1+ tomelr--print-indentation-depth))
-                               (setq tmp (concat tmp tomelr-encoding-default-indentation)))
-                             tmp)))
+        (let (;; Fix the indentation of multi-line strings to 2
+              ;; spaces. If the indentation is increased to 4 or more
+              ;; spaces, those strings will get parsed as code blocks
+              ;; by Markdown parsers.
+              (indentation "  "))
           (setq string
                 (concat
                  indentation ;Indent the first line in the multi-line string
